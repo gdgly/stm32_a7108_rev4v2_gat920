@@ -42,7 +42,7 @@
 #include "calculationavgspeed.h"
 
 
-u32 Crossid;
+extern u32 Crossid;
 
 /**********************************************************************************************************
  @Function			void SOCKET_FillData(void)
@@ -278,6 +278,7 @@ u16 SOCKET_GetLaneNo(u16 outputid)
 	for (i = 0; i < OUTPUT_MAX; i++) {
 		if (SocketDataPacket[i].OutputID == outputid) {
 			laneno = i + 1;
+			break;
 		}
 	}
 	

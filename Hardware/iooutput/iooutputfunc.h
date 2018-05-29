@@ -20,6 +20,7 @@ void IOOutput_Mode5_Supplying(void);										//IO输出定时器补发	(输出方式5 : 车
 void IOOutput_Mode6_Check(u16 dici_index, u16 dici_carnum, u8 dici_in);			//IO输出校验数据	(输出方式6 : 车辆进入,离开时都输出固定时长(不记数))
 void IOOutput_Mode6_Supplying(void);										//IO输出定时器补发	(输出方式6 : 车辆进入,离开时都输出固定时长(不记数))
 
+void IOOutput_Event_IRQn(void);											//IOOutput中断处理函数
 void IOOutput_GetOutputID(u16 *outputid);									//读取output_ID输出端口号到IOOutput控制数据包
 
 #endif

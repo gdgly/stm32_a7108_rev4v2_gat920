@@ -28,6 +28,8 @@ typedef struct
 /* IOOutput外部接口控制管理器 */
 struct _m_iooutput_dev
 {
+	u8		EventIRQnFlag;												//中断产生标志
+	
 	void		(*Mode0IOCheck)(u16, u16, u8);								//IO输出校验数据	(输出方式0 : 跟随车辆输出)
 	void		(*Mode0Supplying)(void);										//IO输出定时器补发	(输出方式0 : 跟随车辆输出)
 	void		(*Mode1IOCheck)(u16, u16, u8);								//IO输出校验数据	(输出方式1 : 车辆进入输出固定时长(记数))
@@ -43,6 +45,7 @@ struct _m_iooutput_dev
 	void		(*Mode6IOCheck)(u16, u16, u8);								//IO输出校验数据	(输出方式6 : 车辆进入,离开时都输出固定时长(不记数))
 	void		(*Mode6Supplying)(void);										//IO输出定时器补发	(输出方式6 : 车辆进入,离开时都输出固定时长(不记数))
 	
+	void		(*EventIRQn)(void);											//IOOutput中断处理函数
 	void		(*ReadOutputID)(u16 *outputid);								//读取output_ID输出端口号到IOOutput控制数据包
 };
 

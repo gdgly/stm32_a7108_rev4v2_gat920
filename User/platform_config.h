@@ -30,8 +30,8 @@
 
 //自动写SN, CROSSID, jFlash烧写程序版本需要去掉
 //#define WRITE_SN_CROSSID
-#define MAC_SN			1804018001
-#define CROSSID		18040101
+#define MAC_SN			1805128001
+#define CROSSID		18051201
 #define INTERVALTIME	60												//统计时长,默认60(单位秒),0上传实时数据
 /*
 MAC_SN : 倒数第三位
@@ -41,9 +41,10 @@ MAC_SN : 倒数第三位
 3 :  Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE,  SocketTime --> ENABLE,  Gat920 --> DISABLE, LESTC --> DISABLE, RJ45 --> ENABLE
 4 :  Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> ENABLE,  LESTC --> DISABLE, GPRS/RJ45 --> DISABLE
 5 :  Modbus --> USART1, Gat920 --> USART2, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> ENABLE,  LESTC --> DISABLE, GPRS/RJ45 --> DISABLE
-6 :  Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE,  SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> ENABLE
+6 :	Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, RJ45 --> ENABLE, SocketModulation --> ENABLE
 7 :  Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE,  SocketTime --> ENABLE,  Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> ENABLE
 8 :  Modbus --> USART2, LESTC  --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> ENABLE,  GPRS --> DISABLE
+9 :  Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, RJ45 --> ENABLE, SocketExtend --> ENABLE, SocketExtendTime --> ENABLE
 */
 
 /* USR使能, 如果注释该宏定义则不配置USR模块 */
@@ -65,6 +66,20 @@ MAC_SN : 倒数第三位
 //#define	SOCKET_SERIALPORT_USART1
 //#define	SOCKET_SERIALPORT_USART2
 #define	SOCKET_SERIALPORT_USART3
+
+/* SocketExtend使能, 如注释该宏定义则不使用SocketExtend协议  */
+#define	SOCKET_EXTEND_ENABLE
+/* SocketExtend使用串口选择 */
+//#define	SOCKET_EXTEND_SERIALPORT_USART1
+//#define	SOCKET_EXTEND_SERIALPORT_USART2
+#define	SOCKET_EXTEND_SERIALPORT_USART3
+
+/* SocketModulation使能, 如注释该宏定义则不使用SocketModulation协议 */
+#define	SOCKET_MODULATION_ENABLE
+/* SocketModulation使用串口选择 */
+//#define	SOCKET_MODULATION_SERIALPORT_USART1
+//#define	SOCKET_MODULATION_SERIALPORT_USART2
+#define	SOCKET_MODULATION_SERIALPORT_USART3
 
 /* Gat920使能, 如注释该宏定义则不使用Gat920协议  */
 #define	GAT920_ENABLE
@@ -243,6 +258,27 @@ typedef enum
 	Socket_ENABLE				// Socket使能
 }PlatFormSocket;				// Socket使能项
 extern PlatFormSocket PlatformSocket;
+
+typedef enum
+{
+	SocketExtendTime_DISABLE,	// SocketExtend不对时
+	SocketExtendTime_ENABLE		// SocketExtend对时
+}PlatFormSocketExtendTime;		// SocketExtend对时项
+extern PlatFormSocketExtendTime PlatformSocketExtendtime;
+
+typedef enum
+{
+	SocketExtend_DISABLE,		// SocketExtend不使能
+	SocketExtend_ENABLE			// SocketExtend使能
+}PlatFormSocketExtend;			// SocketExtend使能项
+extern PlatFormSocketExtend PlatformSocketExtend;
+
+typedef enum
+{
+	SocketModulation_DISABLE,	// SocketModulation不使能
+	SocketModulation_ENABLE		// SocketModulation使能
+}PlatFormSocketModulation;		// SocketModulation使能项
+extern PlatFormSocketModulation PlatformSocketModulation;
 
 typedef enum
 {

@@ -142,4 +142,108 @@ void Time_Adjust(struct rtc_time *tm)
 	RTC_WaitForLastTask();
 }
 
+/***************************************************************
+ @Function			void RTC_Time_Adjust(u8 year, u8 mon, u8 day, u8 hous, u8 min, u8 sec)
+ @Description			时间调节
+ @Input				用于读取RTC时间的结构体指针
+ @Return				void
+***************************************************************/
+void RTC_Time_Adjust(u8 year, u8 mon, u8 day, u8 hous, u8 min, u8 sec)
+{
+	struct rtc_time rtc_tm_s;
+	
+	/* Get time entred by the user on the hyperterminal */
+	/* 设置默认时间 */
+	rtc_tm_s.tm_year	=	year + 2000;
+	rtc_tm_s.tm_mon	=	mon;
+	rtc_tm_s.tm_mday	=	day;
+	rtc_tm_s.tm_hour	=	hous;
+	rtc_tm_s.tm_min	=	min;
+	rtc_tm_s.tm_sec	=	sec;
+	
+	/* Get weekday */
+	GregorianDay(&rtc_tm_s);
+	
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+	PWR_BackupAccessCmd(ENABLE);
+	RTC_WaitForLastTask();
+	
+	/* 修改当前RTC计数寄存器内容 */
+	RTC_SetCounter(mktimev(&rtc_tm_s));
+	
+	RTC_WaitForLastTask();
+}
+
+int RTC_Time_GetDateYear(void)
+{
+	struct rtc_time rtc_tm_s;
+	uint32_t BJ_TimeVar;
+	
+	BJ_TimeVar = RTC_GetCounter();
+	
+	to_tm(BJ_TimeVar, &rtc_tm_s);
+	
+	return rtc_tm_s.tm_year;
+}
+
+int RTC_Time_GetDateMon(void)
+{
+	struct rtc_time rtc_tm_s;
+	uint32_t BJ_TimeVar;
+	
+	BJ_TimeVar = RTC_GetCounter();
+	
+	to_tm(BJ_TimeVar, &rtc_tm_s);
+	
+	return rtc_tm_s.tm_mon;
+}
+
+int RTC_Time_GetDateDay(void)
+{
+	struct rtc_time rtc_tm_s;
+	uint32_t BJ_TimeVar;
+	
+	BJ_TimeVar = RTC_GetCounter();
+	
+	to_tm(BJ_TimeVar, &rtc_tm_s);
+	
+	return rtc_tm_s.tm_mday;
+}
+
+int RTC_Time_GetTimeHour(void)
+{
+	struct rtc_time rtc_tm_s;
+	uint32_t BJ_TimeVar;
+	
+	BJ_TimeVar = RTC_GetCounter();
+	
+	to_tm(BJ_TimeVar, &rtc_tm_s);
+	
+	return rtc_tm_s.tm_hour;
+}
+
+int RTC_Time_GetTimeMin(void)
+{
+	struct rtc_time rtc_tm_s;
+	uint32_t BJ_TimeVar;
+	
+	BJ_TimeVar = RTC_GetCounter();
+	
+	to_tm(BJ_TimeVar, &rtc_tm_s);
+	
+	return rtc_tm_s.tm_min;
+}
+
+int RTC_Time_GetTimeSec(void)
+{
+	struct rtc_time rtc_tm_s;
+	uint32_t BJ_TimeVar;
+	
+	BJ_TimeVar = RTC_GetCounter();
+	
+	to_tm(BJ_TimeVar, &rtc_tm_s);
+	
+	return rtc_tm_s.tm_sec;
+}
+
 /******************************** END OF FLEE **********************************/

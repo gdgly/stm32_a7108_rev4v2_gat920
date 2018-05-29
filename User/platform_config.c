@@ -19,6 +19,9 @@
 
 PlatFormSocketTime			PlatformSockettime = SocketTime_DISABLE;			//Socket对时项
 PlatFormSocket				PlatformSocket = Socket_DISABLE;					//Socket使能项
+PlatFormSocketExtendTime		PlatformSocketExtendtime = SocketExtendTime_DISABLE;	//SocketExtend对时项
+PlatFormSocketExtend		PlatformSocketExtend = SocketExtend_DISABLE;			//SocketExtend使能项
+PlatFormSocketModulation		PlatformSocketModulation = SocketModulation_DISABLE;	//SocketModulation使能项
 PlatFormGat920				PlatformGat920 = Gat920_DISABLE;					//GAT920使能项
 PlatFormModBusUSART			PlatformModbusUsart = Modbus_USART2;				//Modbus连接串口项
 PlatFormGat920USART			PlatformGat920Usart = Gat920_USART1;				//Gat920连接串口项
@@ -39,6 +42,9 @@ void PlatForm_SnToFunction(u32 SN)
 	if ((SN == 0xFFFFFFFF) || (SN == 0x12345678)) {							//SN未烧入
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
@@ -56,6 +62,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> DISABLE, RJ45 --> DISABLE */
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
@@ -68,6 +77,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART1, Gat920 --> USART2, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> DISABLE, RJ45 --> DISABLE */
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART1;								//Modbus连接串口1
 		PlatformGat920Usart = Gat920_USART2;								//Gat920连接串口2
@@ -80,6 +92,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> DISABLE, RJ45 --> ENABLE */
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_ENABLE;									//Socket开启
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
@@ -92,6 +107,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE, SocketTime --> ENABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> DISABLE, RJ45 --> ENABLE */
 		PlatformSockettime = SocketTime_ENABLE;								//Socket对时开启
 		PlatformSocket = Socket_ENABLE;									//Socket开启
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
@@ -104,6 +122,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> ENABLE, LESTC --> DISABLE, GPRS --> DISABLE, RJ45 --> DISABLE */
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_ENABLE;									//Gat920开启
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
@@ -116,6 +137,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART1, Gat920 --> USART2, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> ENABLE, LESTC --> DISABLE, GPRS --> DISABLE, RJ45 --> DISABLE */
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_ENABLE;									//Gat920开启
 		PlatformModbusUsart = Modbus_USART1;								//Modbus连接串口1
 		PlatformGat920Usart = Gat920_USART2;								//Gat920连接串口2
@@ -125,14 +149,17 @@ void PlatForm_SnToFunction(u32 SN)
 		break;
 	
 	case 6:
-		/* Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> ENABLE, RJ45 --> DISABLE */
+		/* Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, RJ45 --> ENABLE, SocketModulation --> ENABLE */
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
-		PlatformSocket = Socket_ENABLE;									//Socket开启
+		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_ENABLE;					//SocketModulation开启
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
-		PlatformGPRS = GPRS_ENABLE;										//GPRS使用
-		PlatformRJ45 = RJ45_DISABLE;										//RJ45不使用
+		PlatformGPRS = GPRS_DISABLE;										//GPRS不使用
+		PlatformRJ45 = RJ45_ENABLE;										//RJ45使用
 		PlatformLESTC = LESTC_DISABLE;									//LESTC不使用
 		break;
 	
@@ -140,6 +167,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE, SocketTime --> ENABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> ENABLE, RJ45 --> DISABLE */
 		PlatformSockettime = SocketTime_ENABLE;								//Socket对时开启
 		PlatformSocket = Socket_ENABLE;									//Socket开启
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
@@ -152,6 +182,9 @@ void PlatForm_SnToFunction(u32 SN)
 		/* Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> ENABLE, GPRS --> DISABLE, RJ45 --> DISABLE */
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
@@ -160,9 +193,27 @@ void PlatForm_SnToFunction(u32 SN)
 		PlatformLESTC = LESTC_ENABLE;										//LESTC使用
 		break;
 	
+	case 9:
+		/* Modbus --> USART2, Gat920 --> USART1, SocketExtend --> ENABLE,  SocketExtendTime --> ENABLE,  Gat920 --> DISABLE, LESTC --> DISABLE, GPRS --> DISABLE, RJ45 --> ENABLE */
+		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
+		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_ENABLE;					//SocketExtend对时开启
+		PlatformSocketExtend = SocketExtend_ENABLE;							//SocketExtend开启
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
+		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
+		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
+		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1
+		PlatformGPRS = GPRS_DISABLE;										//GPRS不使用
+		PlatformRJ45 = RJ45_ENABLE;										//RJ45使用
+		PlatformLESTC = LESTC_DISABLE;									//LESTC不使用
+		break;
+		
 	default :
 		PlatformSockettime = SocketTime_DISABLE;							//Socket对时关闭
 		PlatformSocket = Socket_DISABLE;									//Socket关闭
+		PlatformSocketExtendtime = SocketExtendTime_DISABLE;					//SocketExtend对时关闭
+		PlatformSocketExtend = SocketExtend_DISABLE;							//SocketExtend关闭
+		PlatformSocketModulation = SocketModulation_DISABLE;					//SocketModulation关闭
 		PlatformGat920 = Gat920_DISABLE;									//Gat920关闭
 		PlatformModbusUsart = Modbus_USART2;								//Modbus连接串口2
 		PlatformGat920Usart = Gat920_USART1;								//Gat920连接串口1

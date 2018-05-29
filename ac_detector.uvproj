@@ -373,7 +373,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\Hardware\a7108;.\Hardware\driver;.\Hardware\modbus;.\Hardware\nrf24l01;.\Libraries\library2008\inc;.\User;.\Hardware\rtc;.\Hardware\usart;.\Hardware\gat920;.\Hardware\tcpsocket;.\Hardware\calculation;.\Hardware\iooutput;.\Hardware\usr;.\Hardware\lestc</IncludePath>
+              <IncludePath>.\Hardware\a7108;.\Hardware\driver;.\Hardware\modbus;.\Hardware\nrf24l01;.\Libraries\library2008\inc;.\User;.\Hardware\rtc;.\Hardware\usart;.\Hardware\gat920;.\Hardware\tcpsocket;.\Hardware\extendsocket;.\Hardware\modulationsocket;.\Hardware\calculation;.\Hardware\iooutput;.\Hardware\usr;.\Hardware\lestc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -766,6 +766,56 @@
               <FileName>socketpark.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\tcpsocket\socketpark.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>socketextend</GroupName>
+          <Files>
+            <File>
+              <FileName>socketextendconfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\extendsocket\socketextendconfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketextendinitialization.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\extendsocket\socketextendinitialization.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketextendfunc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\extendsocket\socketextendfunc.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketextendinstantia.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\extendsocket\socketextendinstantia.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>socketmodulation</GroupName>
+          <Files>
+            <File>
+              <FileName>socketmodulationconfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\modulationsocket\socketmodulationconfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketmodulationinitialization.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\modulationsocket\socketmodulationinitialization.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketmodulationfunc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\modulationsocket\socketmodulationfunc.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketmodulationinstantia.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\modulationsocket\socketmodulationinstantia.c</FilePath>
             </File>
           </Files>
         </Group>

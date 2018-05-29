@@ -36,7 +36,7 @@ extern void Delay(vu32 nCount);
 #define RS485_Mode_RX()		GPIO_ResetBits( GPIOA, GPIO_Pin_1 )
 #define RS485_Mode_TX()		GPIO_SetBits( GPIOA, GPIO_Pin_1 )
 
-#define SOCKETRTCHECKENABLE												//RTC对时使能
+#define SOCKETRTCCHECKENABLE												//RTC对时使能
 #define SOCKETRTCCHECKLED1												//选择开启RTC对时LED1提示
 #define SOCKETUSARTTXIRQn												//选择开启USART发送中断(是否使用中断发送或普通发送)
 
@@ -48,7 +48,7 @@ extern void Delay(vu32 nCount);
   * [14:0]:  接收到的数据长度
   */
 volatile u16 SOCKET_RX_STA = 0;											//接收数据状态
-#ifdef SOCKETRTCHECKENABLE
+#ifdef SOCKETRTCCHECKENABLE
 volatile u8  SOCKET_RTC_CHECK = PACKETTYPE_RTCCHECKINIT;						//RTC对时校验标志  0x80上电对时 0x81运行对时 0x01不对时
 #else
 volatile u8  SOCKET_RTC_CHECK = PACKETTYPE_FLOWMESSAGE;
@@ -212,7 +212,7 @@ void SOCKET_Implement(u16 sendtime)
 	}
 
 	if (PlatformSockettime == SocketTime_ENABLE) {
-#ifdef SOCKETRTCHECKENABLE
+#ifdef SOCKETRTCCHECKENABLE
 		rtctime = RTC_GetCounter();										//获取当前时间值
 		if ((rtctime % 86400) == 0) {										//判断是否到达凌晨0点
 			SOCKET_RTC_CHECK = PACKETTYPE_RTCCHECK;							//开启RTC运行对时置0x81
@@ -238,7 +238,7 @@ void SOCKET_USARTSendByte(USART_TypeDef* USARTx, u8 data)
 }
 
 /**********************************************************************************************************
- @Function			void SOCKET_Implement(u16 sendtime)
+ @Function			u32 SOCKET_USARTSend(USART_TypeDef* USARTx, u8 *data_arr, u32 length)
  @Description			Socket数据串口发送
  @Input				统计时长
  @Return				void

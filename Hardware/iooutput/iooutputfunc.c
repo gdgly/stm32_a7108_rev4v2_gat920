@@ -559,9 +559,30 @@ void IOOutput_Mode3_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 void IOOutput_Mode3_Supplying(void)
 {
 	u8 i = 0;
+	u16 hightIOMaxTime = 0;
 	
 	for (i = 0; i < IOOutputMAX; i++) {
 		if (IOOutputStruct[i].OutputID != 0) {												//ID不为0处理
+			
+			/* 高电平超时拉低 */
+			if (IOOutputStruct[i].IOLevel == 1) {
+				IOOutputStruct[i].IOHighUseTime += 1;
+				if (param_recv.vi_output_high_time > param_recv.vo_output_high_time) {
+					hightIOMaxTime = param_recv.vi_output_high_time;
+				}
+				else {
+					hightIOMaxTime = param_recv.vo_output_high_time;
+				}
+				
+				if (IOOutputStruct[i].IOHighUseTime >= (hightIOMaxTime * 1000)) {
+					if (i < OUTPUT_NUM) {
+						GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+					}
+					LestcCarOutSetStatus(&LestcPacketData, i);
+					IOOutputStruct[i].IOLevel = 0;										//电平置0
+					IOOutputStruct[i].IOHighUseTime = 0;									//高电平时间清0
+				}
+			}
 			
 			/* 补发车辆数 */
 			if (IOOutputStruct[i].SupplyingFlag != 0) {
@@ -1364,9 +1385,30 @@ void IOOutput_Mode6_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 void IOOutput_Mode6_Supplying(void)
 {
 	u8 i = 0;
+	u16 hightIOMaxTime = 0;
 	
 	for (i = 0; i < IOOutputMAX; i++) {
 		if (IOOutputStruct[i].OutputID != 0) {												//ID不为0处理
+			
+			/* 高电平超时拉低 */
+			if (IOOutputStruct[i].IOLevel == 1) {
+				IOOutputStruct[i].IOHighUseTime += 1;
+				if (param_recv.vi_output_high_time > param_recv.vo_output_high_time) {
+					hightIOMaxTime = param_recv.vi_output_high_time;
+				}
+				else {
+					hightIOMaxTime = param_recv.vo_output_high_time;
+				}
+				
+				if (IOOutputStruct[i].IOHighUseTime >= (hightIOMaxTime * 1000)) {
+					if (i < OUTPUT_NUM) {
+						GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+					}
+					LestcCarOutSetStatus(&LestcPacketData, i);
+					IOOutputStruct[i].IOLevel = 0;										//电平置0
+					IOOutputStruct[i].IOHighUseTime = 0;									//高电平时间清0
+				}
+			}
 			
 			/* 补发车辆数 */
 			if (IOOutputStruct[i].SupplyingFlag != 0) {
@@ -1812,6 +1854,55 @@ void IOOutput_Mode6_Supplying(void)
 	}
 }
 
+
+/**********************************************************************************************************
+ @Function			void IOOutput_Event_IRQn(void)
+ @Description			IOOutput中断处理函数
+ @Input				outputid
+ @Return				void
+**********************************************************************************************************/
+void IOOutput_Event_IRQn(void)
+{
+	switch (param_recv.output_mode)
+	{
+	//输出方式0 : 跟随车辆输出
+	case 0:
+		if (param_recv.handle_lost == 1) {								//判断是否需要对丢包处理
+			iooutput_dev.Mode0Supplying();							//IO输出丢包补发处理函数 跟随车辆输出
+		}
+		break;
+	//输出方式1 : 车辆进入输出固定时长(记数)
+	case 1:
+		iooutput_dev.Mode1Supplying();								//IO输出丢包补发处理函数 车辆进入输出固定时长(记数)
+		break;
+	//输出方式2 : 车辆离开输出固定时长(记数)
+	case 2:
+		iooutput_dev.Mode2Supplying();								//IO输出丢包补发处理函数 车辆离开输出固定时长(记数)
+		break;
+	//输出方式3 : 车辆进入,离开时都输出固定时长(记数)
+	case 3:
+		iooutput_dev.Mode3Supplying();								//IO输出丢包补发处理函数 车辆进入,离开时都输出固定时长(记数)
+		break;
+	//输出方式4 : 车辆进入输出固定时长(不记数)
+	case 4:
+		iooutput_dev.Mode4Supplying();								//IO输出丢包补发处理函数 车辆进入输出固定时长(不记数)
+		break;
+	//输出方式5 : 车辆离开输出固定时长(不记数)
+	case 5:
+		iooutput_dev.Mode5Supplying();								//IO输出丢包补发处理函数 车辆离开输出固定时长(不记数)
+		break;
+	//输出方式6 : 车辆进入,离开时都输出固定时长(不记数)
+	case 6:
+		iooutput_dev.Mode6Supplying();								//IO输出丢包补发处理函数 车辆进入,离开时都输出固定时长(不记数)
+		break;
+	//默认 输出方式0 : 跟随车辆输出
+	default :
+		if (param_recv.handle_lost == 1) {								//判断是否需要对丢包处理
+			iooutput_dev.Mode0Supplying();							//IO输出丢包补发处理函数 跟随车辆输出
+		}
+		break;
+	}
+}
 
 /**********************************************************************************************************
  @Function			void IOOutput_GetOutputID(u16 *outputid)

@@ -19,6 +19,8 @@
 /* IOOutput外部接口控制例化各函数 */
 struct _m_iooutput_dev iooutput_dev = 
 {
+	0,																//中断产生标志
+	
 	IOOutput_Mode0_Check,												//IO输出校验数据	(输出方式0 : 跟随车辆输出)
 	IOOutput_Mode0_Supplying,											//IO输出定时器补发	(输出方式0 : 跟随车辆输出)
 	IOOutput_Mode1_Check,												//IO输出校验数据	(输出方式1 : 车辆进入输出固定时长(记数))
@@ -34,6 +36,7 @@ struct _m_iooutput_dev iooutput_dev =
 	IOOutput_Mode6_Check,												//IO输出校验数据	(输出方式6 : 车辆进入,离开时都输出固定时长(不记数))
 	IOOutput_Mode6_Supplying,											//IO输出定时器补发	(输出方式6 : 车辆进入,离开时都输出固定时长(不记数))
 	
+	IOOutput_Event_IRQn,												//IOOutput中断处理函数
 	IOOutput_GetOutputID,												//读取output_ID输出端口号到IOOutput控制数据包
 };
 
