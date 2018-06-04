@@ -268,6 +268,10 @@ int main(void)
 		u32params[i] = flash_read(RW_FLashAddr_p4 + i * 4);
 	}
 	FLASH_Lock();
+	
+	param_recv.software_version		= 0x010D;								//软件版本号
+	param_recv.hardware_version		= 0x0402;								//硬件版本号
+	
 	socket_dev.ReadOutputID(output_ID);									//上电读取output_ID输出端口的参数到Socket流量数据包
 	socket_extend_dev.ReadOutputID(output_ID);								//上电读取output_ID输出端口的参数到SocketExtend流量数据包
 	socket_modulation_dev.ReadOutputID(output_ID);							//上电读取output_ID输出端口的参数到SocketModulation流量数据包
@@ -416,6 +420,7 @@ int main(void)
 #endif
 	
 	if (iooutput_dev.EventIRQnFlag == 1) {									//IO输出处理事件
+		iooutput_dev.EventIRQnFlag = 0;									//IO输出中断标志位清空
 		iooutput_dev.EventIRQn();
 	}
 	
@@ -965,7 +970,7 @@ void init_param_recv_default(u32 sn, u32 crossid)
   	param_recv.handle_lost 			= 1;									//是否对丢包进行处理
   	param_recv.check_repeat_time 		= 0;									//检查数据包是否重复的时间
 	param_recv.simple_mode 			= 1;									//RT数据模式是否是简单模式
-	param_recv.software_version		= 0x010C;								//软件版本号
+	param_recv.software_version		= 0x010D;								//软件版本号
 	param_recv.hardware_version		= 0x0402;								//硬件版本号
 
 	param_wvd_cfg.addr_dev 			= 0xffff;								//检测器序列号
