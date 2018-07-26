@@ -31,15 +31,21 @@ void Delay(vu32 nCount)
 }
 void delay_1ms(u32 nCount)
 {
+	u16 temp16_count = 0;
+	
 	while (nCount) {
 		delay_5us(200);
 		nCount--;
+		temp16_count++;
+		if (temp16_count >= 5) {
+			temp16_count = 0;
 #ifdef HARDWAREIWDG
-		MAX823_IWDGReloadCounter();										//Ó²¼þ¿´ÃÅ¹·Î¹¹·
+			MAX823_IWDGReloadCounter();									//Ó²¼þ¿´ÃÅ¹·Î¹¹·
 #endif
 #ifdef SOFTWAREIWDG
-		IWDG_ReloadCounter();											//Èí¼þ¿´ÃÅ¹·Î¹¹·
+			IWDG_ReloadCounter();										//Èí¼þ¿´ÃÅ¹·Î¹¹·
 #endif
+		}
 	}
 }
 
@@ -91,7 +97,18 @@ void MAX823_IWDGDisable(void)
 **********************************************************************************************************/
 void MAX823_IWDGReloadCounter(void)
 {
-	MAX823WDIGPIO->ODR ^= MAX823WDIPIN;
+	static u8 max823iwdg = 1;
+	
+	if (max823iwdg != 0) {
+		max823iwdg = 0;
+		GPIO_ResetBits(MAX823WDIGPIO, MAX823WDIPIN);
+	}
+	else {
+		max823iwdg = 1;
+		GPIO_SetBits(MAX823WDIGPIO, MAX823WDIPIN);
+	}
+	
+//	MAX823WDIGPIO->ODR ^= MAX823WDIPIN;
 }
 
 /*******************************************************************************

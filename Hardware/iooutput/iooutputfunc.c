@@ -67,6 +67,7 @@ void IOOutput_Mode0_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 			}
 		}
 		IOOutputStruct[dici_index].CarNumState = dici_carnum;					//记录车辆数状态值
+		IOOutputStruct[dici_index].SupplyedIOLevel = dici_in;					//获取补充车辆数结束后输出电平
 		
 		/* 判断该地磁是否正在补发数据 */
 		if (IOOutputStruct[dici_index].SupplyingFlag == 0) {					//补发结束
@@ -90,7 +91,6 @@ void IOOutput_Mode0_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 			}
 			else {													//需要补充车辆数
 				IOOutputStruct[dici_index].SupplyCarNum = carnum;				//获取需要补发的车辆数
-				IOOutputStruct[dici_index].SupplyedIOLevel = dici_in;			//获取补充车辆数结束后输出电平
 				IOOutputStruct[dici_index].SupplyingFlag = 1;				//标志车辆数正在补发中
 			}
 		}
@@ -99,7 +99,7 @@ void IOOutput_Mode0_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 			if (IOOutputStruct[dici_index].SupplyingCarNum >= IOOutputNUM) {		//正在补发中收到的车辆数超过需补发最大车辆数
 				IOOutputStruct[dici_index].SupplyingCarNum = IOOutputNUM;
 			}
-			IOOutputStruct[dici_index].SupplyedIOLevel = dici_in;				//获取补充车辆数结束后输出电平
+			IOOutputStruct[dici_index].SupplyingFlag = 1;					//标志车辆数正在补发中
 		}
 	}
 }
@@ -127,6 +127,7 @@ void IOOutput_Mode0_Supplying(void)
 					LestcCarOutSetStatus(&LestcPacketData, i);
 					IOOutputStruct[i].IOLevel = 0;						//电平置0
 					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					IOOutputStruct[i].SupplyedIOLevel = 0;
 				}
 			}
 			
@@ -156,8 +157,6 @@ void IOOutput_Mode0_Supplying(void)
 					IOOutputStruct[i].SupplyUseTime = 0;
 					IOOutputStruct[i].SupplyCarNum -= 1;					//补发车辆数减一
 					if (IOOutputStruct[i].SupplyCarNum == 0) {				//补发车辆数完成
-						IOOutputStruct[i].SupplyCarNum = 0;				//清空补发车辆数
-						IOOutputStruct[i].SupplyingFlag = 0;				//补发结束置0
 						if (IOOutputStruct[i].SupplyedIOLevel == 0) {		//补发结束电平值
 							if (i < OUTPUT_NUM) {
 								GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
@@ -174,7 +173,8 @@ void IOOutput_Mode0_Supplying(void)
 							IOOutputStruct[i].IOLevel = 1;				//电平置1
 							IOOutputStruct[i].IOHighUseTime = 0;			//高电平时间清0
 						}
-						
+						IOOutputStruct[i].SupplyCarNum = 0;				//清空补发车辆数
+						IOOutputStruct[i].SupplyingFlag = 0;				//补发结束置0
 						if (IOOutputStruct[i].SupplyingCarNum != 0) {		//补发中收到车辆数
 							IOOutputStruct[i].SupplyCarNum += IOOutputStruct[i].SupplyingCarNum;					//获取需要补发的车辆数
 							IOOutputStruct[i].SupplyingCarNum = 0;

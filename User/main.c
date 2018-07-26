@@ -269,8 +269,8 @@ int main(void)
 	}
 	FLASH_Lock();
 	
-	param_recv.software_version		= 0x010D;								//软件版本号
-	param_recv.hardware_version		= 0x0402;								//硬件版本号
+	param_recv.software_version		= MVB_SOFTWARE_VERSION;					//软件版本号
+	param_recv.hardware_version		= MVB_HARDWARE_VERSION;					//硬件版本号
 	
 	socket_dev.ReadOutputID(output_ID);									//上电读取output_ID输出端口的参数到Socket流量数据包
 	socket_extend_dev.ReadOutputID(output_ID);								//上电读取output_ID输出端口的参数到SocketExtend流量数据包
@@ -970,8 +970,8 @@ void init_param_recv_default(u32 sn, u32 crossid)
   	param_recv.handle_lost 			= 1;									//是否对丢包进行处理
   	param_recv.check_repeat_time 		= 0;									//检查数据包是否重复的时间
 	param_recv.simple_mode 			= 1;									//RT数据模式是否是简单模式
-	param_recv.software_version		= 0x010D;								//软件版本号
-	param_recv.hardware_version		= 0x0402;								//硬件版本号
+	param_recv.software_version		= MVB_SOFTWARE_VERSION;					//软件版本号
+	param_recv.hardware_version		= MVB_HARDWARE_VERSION;					//硬件版本号
 
 	param_wvd_cfg.addr_dev 			= 0xffff;								//检测器序列号
 	param_wvd_cfg.config_item 		= 0x0;								//配置位

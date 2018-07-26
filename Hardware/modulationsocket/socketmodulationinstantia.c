@@ -317,7 +317,19 @@ u8 SOCKET_Modulation_GetProcessCycle(void)
 **********************************************************************************************************/
 u16 SOCKET_Modulation_GetTimeSerial(void)
 {
-	return (RTC_Time_GetTimeHour() * 60 + RTC_Time_GetTimeMin());
+	u16 timeSerial = 0;
+	
+	if ((RTC_Time_GetTimeHour() * 60 + RTC_Time_GetTimeMin()) == 0) {
+		timeSerial = 1440 / SOCKET_MODULATION_PROCESS_CYCLE;
+	}
+	else if (((RTC_Time_GetTimeHour() * 60 + RTC_Time_GetTimeMin()) % SOCKET_MODULATION_PROCESS_CYCLE) != 0) {
+		timeSerial = ((RTC_Time_GetTimeHour() * 60 + RTC_Time_GetTimeMin()) / SOCKET_MODULATION_PROCESS_CYCLE) + 1;
+	}
+	else {
+		timeSerial = ((RTC_Time_GetTimeHour() * 60 + RTC_Time_GetTimeMin()) / SOCKET_MODULATION_PROCESS_CYCLE);
+	}
+	
+	return timeSerial;
 }
 
 /**********************************************************************************************************

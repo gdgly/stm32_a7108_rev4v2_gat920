@@ -132,7 +132,7 @@ void SOCKET_Extend_FillData(void)
 						SocketExtendDataPacket[indexA].AddUpQueueTime		= SocketExtendDataPacket[indexB - 1].AddUpQueueTime;							//写入AddUpQueueTime
 						SocketExtendDataPacket[indexA].RedLightCount			= SocketExtendDataPacket[indexB - 1].RedLightCount;							//写入RedLightCount
 						SocketExtendDataPacket[indexA].PrecedingWayFullTime	= SocketExtendDataPacket[indexB - 1].PrecedingWayFullTime;						//写入PrecedingWayFullTime
-						SocketExtendDataPacket[indexA].DirverWayCode			= indexA + 1;															//写入DirverWayCode
+						SocketExtendDataPacket[indexA].DirverWayCode			= socket_extend_dev.GetDirverWayCode(SocketExtendDataPacket[indexA].OutputID);		//写入DirverWayCode
 						SocketExtendDataPacket[indexA].Status				= SocketExtendDataPacket[indexB - 1].Status;									//写入Status
 						SocketExtendDataPacket[indexA].Reserver1			= SocketExtendDataPacket[indexB - 1].Reserver1;								//写入Reserver1
 						SocketExtendDataPacket[indexA].Reserver2			= SocketExtendDataPacket[indexB - 1].Reserver2;								//写入Reserver2
@@ -175,7 +175,7 @@ void SOCKET_Extend_FillData(void)
 					SocketExtendDataPacket[indexA].AddUpQueueTime			= socket_extend_dev.GetAddUpQueueTime(SocketExtendDataPacket[indexA].OutputID);		//写入AddUpQueueTime
 					SocketExtendDataPacket[indexA].RedLightCount				= socket_extend_dev.GetRedLightCount(SocketExtendDataPacket[indexA].OutputID);		//写入RedLightCount
 					SocketExtendDataPacket[indexA].PrecedingWayFullTime		= socket_extend_dev.GetPrecedingWayFullTime(SocketExtendDataPacket[indexA].OutputID);//写入PrecedingWayFullTime
-					SocketExtendDataPacket[indexA].DirverWayCode				= indexA + 1;															//写入DirverWayCode
+					SocketExtendDataPacket[indexA].DirverWayCode				= socket_extend_dev.GetDirverWayCode(SocketExtendDataPacket[indexA].OutputID);		//写入DirverWayCode
 					SocketExtendDataPacket[indexA].Status					= socket_extend_dev.GetStatus(SocketExtendDataPacket[indexA].OutputID);			//写入Status
 					SocketExtendDataPacket[indexA].Reserver1				= socket_extend_dev.GetReserver1(SocketExtendDataPacket[indexA].OutputID);			//写入Reserver1
 					SocketExtendDataPacket[indexA].Reserver2				= socket_extend_dev.GetReserver2(SocketExtendDataPacket[indexA].OutputID);			//写入Reserver2
@@ -218,7 +218,7 @@ void SOCKET_Extend_FillData(void)
 					SocketExtendDataPacket[indexA].AddUpQueueTime			= SocketExtendDataPacket[indexA - SPEEDLANNUMMAX].AddUpQueueTime;				//写入AddUpQueueTime
 					SocketExtendDataPacket[indexA].RedLightCount				= SocketExtendDataPacket[indexA - SPEEDLANNUMMAX].RedLightCount;					//写入RedLightCount
 					SocketExtendDataPacket[indexA].PrecedingWayFullTime		= SocketExtendDataPacket[indexA - SPEEDLANNUMMAX].PrecedingWayFullTime;			//写入PrecedingWayFullTime
-					SocketExtendDataPacket[indexA].DirverWayCode				= indexA + 1;															//写入DirverWayCode
+					SocketExtendDataPacket[indexA].DirverWayCode				= socket_extend_dev.GetDirverWayCode(SocketExtendDataPacket[indexA].OutputID);		//写入DirverWayCode
 					SocketExtendDataPacket[indexA].Status					= SocketExtendDataPacket[indexA - SPEEDLANNUMMAX].Status;						//写入Status
 					SocketExtendDataPacket[indexA].Reserver1				= SocketExtendDataPacket[indexA - SPEEDLANNUMMAX].Reserver1;					//写入Reserver1
 					SocketExtendDataPacket[indexA].Reserver2				= SocketExtendDataPacket[indexA - SPEEDLANNUMMAX].Reserver2;					//写入Reserver2
@@ -261,7 +261,7 @@ void SOCKET_Extend_FillData(void)
 							SocketExtendDataPacket[indexA].AddUpQueueTime		= SocketExtendDataPacket[indexB - 1].AddUpQueueTime;						//写入AddUpQueueTime
 							SocketExtendDataPacket[indexA].RedLightCount			= SocketExtendDataPacket[indexB - 1].RedLightCount;						//写入RedLightCount
 							SocketExtendDataPacket[indexA].PrecedingWayFullTime	= SocketExtendDataPacket[indexB - 1].PrecedingWayFullTime;					//写入PrecedingWayFullTime
-							SocketExtendDataPacket[indexA].DirverWayCode			= indexA + 1;														//写入DirverWayCode
+							SocketExtendDataPacket[indexA].DirverWayCode			= socket_extend_dev.GetDirverWayCode(SocketExtendDataPacket[indexA].OutputID);	//写入DirverWayCode
 							SocketExtendDataPacket[indexA].Status				= SocketExtendDataPacket[indexB - 1].Status;								//写入Status
 							SocketExtendDataPacket[indexA].Reserver1			= SocketExtendDataPacket[indexB - 1].Reserver1;							//写入Reserver1
 							SocketExtendDataPacket[indexA].Reserver2			= SocketExtendDataPacket[indexB - 1].Reserver2;							//写入Reserver2
@@ -304,7 +304,7 @@ void SOCKET_Extend_FillData(void)
 						SocketExtendDataPacket[indexA].AddUpQueueTime		= socket_extend_dev.GetAddUpQueueTime(SocketExtendDataPacket[indexA].OutputID);		//写入AddUpQueueTime
 						SocketExtendDataPacket[indexA].RedLightCount			= socket_extend_dev.GetRedLightCount(SocketExtendDataPacket[indexA].OutputID);		//写入RedLightCount
 						SocketExtendDataPacket[indexA].PrecedingWayFullTime	= socket_extend_dev.GetPrecedingWayFullTime(SocketExtendDataPacket[indexA].OutputID);//写入PrecedingWayFullTime
-						SocketExtendDataPacket[indexA].DirverWayCode			= indexA + 1;															//写入DirverWayCode
+						SocketExtendDataPacket[indexA].DirverWayCode			= socket_extend_dev.GetDirverWayCode(SocketExtendDataPacket[indexA].OutputID);		//写入DirverWayCode
 						SocketExtendDataPacket[indexA].Status				= socket_extend_dev.GetStatus(SocketExtendDataPacket[indexA].OutputID);			//写入Status
 						SocketExtendDataPacket[indexA].Reserver1			= socket_extend_dev.GetReserver1(SocketExtendDataPacket[indexA].OutputID);			//写入Reserver1
 						SocketExtendDataPacket[indexA].Reserver2			= socket_extend_dev.GetReserver2(SocketExtendDataPacket[indexA].OutputID);			//写入Reserver2
@@ -941,12 +941,42 @@ u16 SOCKET_Extend_GetPrecedingWayFullTime(u16 outputid)
 u32 SOCKET_Extend_GetDirverWayCode(u16 outputid)
 {
 	u8 i = 0;
-	u16 laneno = 1;
+	u16 laneno = 101;
 	
 	for (i = 0; i < OUTPUT_MAX; i++) {
 		if (SocketExtendDataPacket[i].OutputID == outputid) {
-			laneno = i + 1;
-			break;
+			if (i <= 3) {
+				laneno = i + 1 + 100;
+				break;
+			}
+			else if ((i >= 4) && (i <= 7)) {
+				laneno = i + 1 + 200 - 4;
+				break;
+			}
+			else if ((i >= 8) && (i <= 11)) {
+				laneno = i + 1 + 300 - 8;
+				break;
+			}
+			else if ((i >= 12) && (i <= 15)) {
+				laneno = i + 1 + 400 - 12;
+				break;
+			}
+			else if ((i >= 16) && (i <= 19)) {
+				laneno = i + 1 + 100 - 12;
+				break;
+			}
+			else if ((i >= 20) && (i <= 23)) {
+				laneno = i + 1 + 200 - 16;
+				break;
+			}
+			else if ((i >= 24) && (i <= 27)) {
+				laneno = i + 1 + 300 - 20;
+				break;
+			}
+			else if ((i >= 28) && (i <= 31)) {
+				laneno = i + 1 + 400 - 24;
+				break;
+			}
 		}
 	}
 	

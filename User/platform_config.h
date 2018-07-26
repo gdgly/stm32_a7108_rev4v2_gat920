@@ -30,8 +30,8 @@
 
 //自动写SN, CROSSID, jFlash烧写程序版本需要去掉
 //#define WRITE_SN_CROSSID
-#define MAC_SN			1805128001
-#define CROSSID		18051201
+#define MAC_SN			1807128001
+#define CROSSID		18071201
 #define INTERVALTIME	60												//统计时长,默认60(单位秒),0上传实时数据
 /*
 MAC_SN : 倒数第三位
@@ -52,6 +52,9 @@ MAC_SN : 倒数第三位
 #define	LOCALPORTMODE		1											//本地端口 0:随机 1:固定
 #define	LOCALPORT			"4008"										//本地端口值0~65535
 #define	DHCP				0											//0:静态IP 1:DHCP
+
+#define	MVB_SOFTWARE_VERSION		0x010F
+#define	MVB_HARDWARE_VERSION		0x0402
 
 /* ModBus使能, 如注释该宏定义则不使用ModBus协议 */
 #define	MODBUS_ENABLE
