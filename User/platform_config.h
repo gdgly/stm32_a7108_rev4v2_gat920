@@ -53,7 +53,7 @@ MAC_SN : 倒数第三位
 #define	LOCALPORT			"4008"										//本地端口值0~65535
 #define	DHCP				0											//0:静态IP 1:DHCP
 
-#define	MVB_SOFTWARE_VERSION		0x010F
+#define	MVB_SOFTWARE_VERSION		0x0111
 #define	MVB_HARDWARE_VERSION		0x0402
 
 /* ModBus使能, 如注释该宏定义则不使用ModBus协议 */

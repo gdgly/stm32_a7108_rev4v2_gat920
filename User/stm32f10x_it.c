@@ -253,10 +253,10 @@ void RTC_IRQHandler(void)
 			if(param_wvd_cfg.config_item != 0)
 			{
 				param_wvd_cfg.config_item = 0;
-				if(param_wvd_cfg.config_interval < 61)
+				if(param_wvd_cfg.config_interval < 15)
 				{
 					param_wvd_cfg.config_item = 4;
-					param_wvd_cfg.config_interval = 61;
+					param_wvd_cfg.config_interval = 15;
 				}
 				param_save_to_flash();
 			}

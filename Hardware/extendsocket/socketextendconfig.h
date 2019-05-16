@@ -152,7 +152,7 @@ struct _m_socket_extend_dev
 	u16		(*GetAddUpQueueTime)(u16);							//例化获取AddUpQueueTime累计排队时间(秒)
 	u16		(*GetRedLightCount)(u16);							//例化获取RedLightCount闯红灯触发次数
 	u16		(*GetPrecedingWayFullTime)(u16);						//例化获取PrecedingWayFullTime前方车道满累计时间
-	u32		(*GetDirverWayCode)(u16);							//例化获取DirverWayCode车道代码
+	u32		(*GetDirverWayCode)(u16,u16);							//例化获取DirverWayCode车道代码
 	u8		(*GetStatus)(u16);									//例化获取Status状态(0未启用1启用)
 	u8		(*GetReserver1)(u16);								//例化获取Reserver1预留
 	u8		(*GetReserver2)(u16);								//例化获取Reserver2预留
