@@ -16,6 +16,7 @@
 #include "iooutputfunc.h"
 #include "lestcconfig.h"
 #include "lestcfunc.h"
+#include "gatconfig.h"
 
 IOOutputTypedef				IOOutputStruct[IOOutputMAX];					//IOOutput控制结构体
 
@@ -42,17 +43,21 @@ void IOOutput_Mode0_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_SetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarInSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 1) {
+				LestcCarInSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 		else {
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_ResetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarOutSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 0) {
+				LestcCarOutSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 	}
 	else {															//已初始化完成
@@ -76,17 +81,21 @@ void IOOutput_Mode0_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 					if (dici_index < OUTPUT_NUM) {
 						GPIO_SetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 					}
-					LestcCarInSetStatus(&LestcPacketData, dici_index);
-					IOOutputStruct[dici_index].IOLevel = 1;					//电平置1
-					IOOutputStruct[dici_index].IOHighUseTime = 0;			//高电平时间清0
+					if (IOOutputStruct[dici_index].IOLevel != 1) {
+						LestcCarInSetStatus(&LestcPacketData, dici_index);
+						IOOutputStruct[dici_index].IOLevel = 1;					//电平置1
+						IOOutputStruct[dici_index].IOHighUseTime = 0;			//高电平时间清0
+					}
 				}
 				else {
 					if (dici_index < OUTPUT_NUM) {
 						GPIO_ResetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 					}
-					LestcCarOutSetStatus(&LestcPacketData, dici_index);
-					IOOutputStruct[dici_index].IOLevel = 0;					//电平置0
-					IOOutputStruct[dici_index].IOHighUseTime = 0;			//高电平时间清0
+					if (IOOutputStruct[dici_index].IOLevel != 0) {
+						LestcCarOutSetStatus(&LestcPacketData, dici_index);
+						IOOutputStruct[dici_index].IOLevel = 0;					//电平置0
+						IOOutputStruct[dici_index].IOHighUseTime = 0;			//高电平时间清0
+					}
 				}
 			}
 			else {													//需要补充车辆数
@@ -124,9 +133,11 @@ void IOOutput_Mode0_Supplying(void)
 					if (i < OUTPUT_NUM) {
 						GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 					}
-					LestcCarOutSetStatus(&LestcPacketData, i);
-					IOOutputStruct[i].IOLevel = 0;						//电平置0
-					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					if (IOOutputStruct[i].IOLevel != 0) {
+						LestcCarOutSetStatus(&LestcPacketData, i);
+						IOOutputStruct[i].IOLevel = 0;						//电平置0
+						IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					}
 					IOOutputStruct[i].SupplyedIOLevel = 0;
 				}
 			}
@@ -138,17 +149,21 @@ void IOOutput_Mode0_Supplying(void)
 					if (i < OUTPUT_NUM) {
 						GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 					}
-					LestcCarOutSetStatus(&LestcPacketData, i);
-					IOOutputStruct[i].IOLevel = 0;						//电平置0
-					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					if (IOOutputStruct[i].IOLevel != 0) {
+						LestcCarOutSetStatus(&LestcPacketData, i);
+						IOOutputStruct[i].IOLevel = 0;						//电平置0
+						IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					}
 				}
 				else if (IOOutputStruct[i].SupplyUseTime == (param_recv.output_low_min * 20)) {
 					if (i < OUTPUT_NUM) {
 						GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 					}
-					LestcCarInSetStatus(&LestcPacketData, i);
-					IOOutputStruct[i].IOLevel = 1;						//电平置1
-					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					if (IOOutputStruct[i].IOLevel != 1) {
+						LestcCarInSetStatus(&LestcPacketData, i);
+						IOOutputStruct[i].IOLevel = 1;						//电平置1
+						IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					}
 				}
 				
 				IOOutputStruct[i].SupplyUseTime += 1;
@@ -161,17 +176,21 @@ void IOOutput_Mode0_Supplying(void)
 							if (i < OUTPUT_NUM) {
 								GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 							}
-							LestcCarOutSetStatus(&LestcPacketData, i);
-							IOOutputStruct[i].IOLevel = 0;				//电平置0
-							IOOutputStruct[i].IOHighUseTime = 0;			//高电平时间清0
+							if (IOOutputStruct[i].IOLevel != 0) {
+								LestcCarOutSetStatus(&LestcPacketData, i);
+								IOOutputStruct[i].IOLevel = 0;				//电平置0
+								IOOutputStruct[i].IOHighUseTime = 0;			//高电平时间清0
+							}
 						}
 						else {
 							if (i < OUTPUT_NUM) {
 								GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 							}
-							LestcCarInSetStatus(&LestcPacketData, i);
-							IOOutputStruct[i].IOLevel = 1;				//电平置1
-							IOOutputStruct[i].IOHighUseTime = 0;			//高电平时间清0
+							if (IOOutputStruct[i].IOLevel != 1) {
+								LestcCarInSetStatus(&LestcPacketData, i);
+								IOOutputStruct[i].IOLevel = 1;				//电平置1
+								IOOutputStruct[i].IOHighUseTime = 0;			//高电平时间清0
+							}
 						}
 						IOOutputStruct[i].SupplyCarNum = 0;				//清空补发车辆数
 						IOOutputStruct[i].SupplyingFlag = 0;				//补发结束置0
@@ -210,17 +229,21 @@ void IOOutput_Mode1_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_SetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarInSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 1) {
+				LestcCarInSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 		else {
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_ResetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarOutSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 0) {
+				LestcCarOutSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 	}
 	else {															//已初始化完成
@@ -274,17 +297,21 @@ void IOOutput_Mode1_Supplying(void)
 					if (i < OUTPUT_NUM) {
 						GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 					}
-					LestcCarInSetStatus(&LestcPacketData, i);
-					IOOutputStruct[i].IOLevel = 1;						//电平置1
-					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					if (IOOutputStruct[i].IOLevel != 1) {
+						LestcCarInSetStatus(&LestcPacketData, i);
+						IOOutputStruct[i].IOLevel = 1;						//电平置1
+						IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					}
 				}
 				else if (IOOutputStruct[i].SupplyUseTime == (param_recv.vi_output_high_time * 20)) {
 					if (i < OUTPUT_NUM) {
 						GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 					}
-					LestcCarOutSetStatus(&LestcPacketData, i);
-					IOOutputStruct[i].IOLevel = 0;						//电平置0
-					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					if (IOOutputStruct[i].IOLevel != 0) {
+						LestcCarOutSetStatus(&LestcPacketData, i);
+						IOOutputStruct[i].IOLevel = 0;						//电平置0
+						IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					}
 				}
 				
 				IOOutputStruct[i].SupplyUseTime += 1;
@@ -298,9 +325,11 @@ void IOOutput_Mode1_Supplying(void)
 						if (i < OUTPUT_NUM) {
 							GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 						}
-						LestcCarOutSetStatus(&LestcPacketData, i);
-						IOOutputStruct[i].IOLevel = 0;					//电平置0
-						IOOutputStruct[i].IOHighUseTime = 0;				//高电平时间清0
+						if (IOOutputStruct[i].IOLevel != 0) {
+							LestcCarOutSetStatus(&LestcPacketData, i);
+							IOOutputStruct[i].IOLevel = 0;					//电平置0
+							IOOutputStruct[i].IOHighUseTime = 0;				//高电平时间清0
+						}
 						
 						if (IOOutputStruct[i].SupplyingCarNum != 0) {		//补发中收到车辆数
 							IOOutputStruct[i].SupplyCarNum += IOOutputStruct[i].SupplyingCarNum;					//获取需要补发的车辆数
@@ -337,17 +366,21 @@ void IOOutput_Mode2_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_SetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarInSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 1) {
+				LestcCarInSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 		else {
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_ResetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarOutSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 0) {
+				LestcCarOutSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 	}
 	else {															//已初始化完成
@@ -401,17 +434,21 @@ void IOOutput_Mode2_Supplying(void)
 					if (i < OUTPUT_NUM) {
 						GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 					}
-					LestcCarInSetStatus(&LestcPacketData, i);
-					IOOutputStruct[i].IOLevel = 1;						//电平置1
-					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					if (IOOutputStruct[i].IOLevel != 1) {
+						LestcCarInSetStatus(&LestcPacketData, i);
+						IOOutputStruct[i].IOLevel = 1;						//电平置1
+						IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					}
 				}
 				else if (IOOutputStruct[i].SupplyUseTime == (param_recv.vo_output_high_time * 20)) {
 					if (i < OUTPUT_NUM) {
 						GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 					}
-					LestcCarOutSetStatus(&LestcPacketData, i);
-					IOOutputStruct[i].IOLevel = 0;						//电平置0
-					IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					if (IOOutputStruct[i].IOLevel != 0) {
+						LestcCarOutSetStatus(&LestcPacketData, i);
+						IOOutputStruct[i].IOLevel = 0;						//电平置0
+						IOOutputStruct[i].IOHighUseTime = 0;					//高电平时间清0
+					}
 				}
 				
 				IOOutputStruct[i].SupplyUseTime += 1;
@@ -425,9 +462,11 @@ void IOOutput_Mode2_Supplying(void)
 						if (i < OUTPUT_NUM) {
 							GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
 						}
-						LestcCarOutSetStatus(&LestcPacketData, i);
-						IOOutputStruct[i].IOLevel = 0;					//电平置0
-						IOOutputStruct[i].IOHighUseTime = 0;				//高电平时间清0
+						if (IOOutputStruct[i].IOLevel != 0) {
+							LestcCarOutSetStatus(&LestcPacketData, i);
+							IOOutputStruct[i].IOLevel = 0;					//电平置0
+							IOOutputStruct[i].IOHighUseTime = 0;				//高电平时间清0
+						}
 						
 						if (IOOutputStruct[i].SupplyingCarNum != 0) {		//补发中收到车辆数
 							IOOutputStruct[i].SupplyCarNum += IOOutputStruct[i].SupplyingCarNum;					//获取需要补发的车辆数
@@ -464,17 +503,21 @@ void IOOutput_Mode3_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_SetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarInSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 1) {
+				LestcCarInSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 1;							//电平置1
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 		else {
 			if (dici_index < OUTPUT_NUM) {
 				GPIO_ResetBits(OUTPUT_TYPE[dici_index],  OUTPUT_PIN[dici_index]);
 			}
-			LestcCarOutSetStatus(&LestcPacketData, dici_index);
-			IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
-			IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			if (IOOutputStruct[dici_index].IOLevel != 0) {
+				LestcCarOutSetStatus(&LestcPacketData, dici_index);
+				IOOutputStruct[dici_index].IOLevel = 0;							//电平置0
+				IOOutputStruct[dici_index].IOHighUseTime = 0;					//高电平时间清0
+			}
 		}
 	}
 	else {															//已初始化完成

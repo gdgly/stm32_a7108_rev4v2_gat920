@@ -30,14 +30,18 @@
 
 //自动写SN, CROSSID, jFlash烧写程序版本需要去掉
 //#define WRITE_SN_CROSSID
-#define MAC_SN			1807128001
-#define CROSSID		18071201
+#define MAC_SN			1905218001
+#define CROSSID		19052101
 #define INTERVALTIME	60												//统计时长,默认60(单位秒),0上传实时数据
+
+#define SOCKET_TYPE_NORMAL			0
+#define SOCKET_TYPE_XUNFEI			1
+#define SOCKET_FUNC_TYPE				SOCKET_TYPE_NORMAL						//Select socket function normal or xunfei
 /*
 MAC_SN : 倒数第三位
 0 :  Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS/RJ45 --> DISABLE
 1 :  Modbus --> USART1, Gat920 --> USART2, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS/RJ45 --> DISABLE
-2 :  Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE,  SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, RJ45 --> ENABLE
+2 :  Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE,  SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, RJ45 --> ENABLE or SocketXunfei --> ENABLE
 3 :  Modbus --> USART2, Gat920 --> USART1, Socket --> ENABLE,  SocketTime --> ENABLE,  Gat920 --> DISABLE, LESTC --> DISABLE, RJ45 --> ENABLE
 4 :  Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> ENABLE,  LESTC --> DISABLE, GPRS/RJ45 --> DISABLE
 5 :  Modbus --> USART1, Gat920 --> USART2, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> ENABLE,  LESTC --> DISABLE, GPRS/RJ45 --> DISABLE
@@ -53,7 +57,7 @@ MAC_SN : 倒数第三位
 #define	LOCALPORT			"4008"										//本地端口值0~65535
 #define	DHCP				0											//0:静态IP 1:DHCP
 
-#define	MVB_SOFTWARE_VERSION		0x0111
+#define	MVB_SOFTWARE_VERSION		0x0112
 #define	MVB_HARDWARE_VERSION		0x0402
 
 /* ModBus使能, 如注释该宏定义则不使用ModBus协议 */
@@ -83,6 +87,13 @@ MAC_SN : 倒数第三位
 //#define	SOCKET_MODULATION_SERIALPORT_USART1
 //#define	SOCKET_MODULATION_SERIALPORT_USART2
 #define	SOCKET_MODULATION_SERIALPORT_USART3
+
+/* SocketXunfei使能, 如注释该宏定义则不使用SocketModulation协议 */
+#define	SOCKET_XUNFEI_ENABLE
+/* SocketXunfei使用串口选择 */
+//#define	SOCKET_XUNFEI_SERIALPORT_USART1
+//#define	SOCKET_XUNFEI_SERIALPORT_USART2
+#define	SOCKET_XUNFEI_SERIALPORT_USART3
 
 /* Gat920使能, 如注释该宏定义则不使用Gat920协议  */
 #define	GAT920_ENABLE
@@ -192,7 +203,8 @@ typedef struct
 	u8  simple_mode;			// RT数据模式是否是简单模式
 	u16 software_version;		// 软件版本号
 	u16 hardware_version;		// 硬件版本号
-}mvb_param_recv;				// 接收主机参数共40个字节(占44字节)
+	u16 dirverway_config;		// Dirverway Config Socket
+}mvb_param_recv;				// 接收主机参数共42个字节(占44字节)
 
 typedef struct
 {

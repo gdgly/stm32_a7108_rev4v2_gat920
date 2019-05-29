@@ -132,6 +132,7 @@ PR_BEGIN_EXTERN_C
 0x0013	接收器的系统时间的低位		0-65535	R,W
 0x0014	接收器的出厂路口编码的高位	0-65535	R,O
 0x0015	接收器的出厂路口编码的低位	0-65535	R,O
+0x0016	SocketDirverWayCode车道代码	0-65535	R,W
 
 0x1000	要配置的车检器出厂序号				R,W
 0x1001	要配置的车检器信息标志位				R,W
@@ -183,6 +184,7 @@ PR_BEGIN_EXTERN_C
 #define REG_RW_RTC_TIME_L					0x0013
 #define REG_RO_CROSSID_H						0x0014
 #define REG_RO_CROSSID_L						0x0015
+#define REG_RW_DIRVERWAY_CONFIG				0x0016
 
 #define REG_RW_WVD_ID						0x1000
 #define REG_RW_WVD_CONFIG_FLAG				0x1001

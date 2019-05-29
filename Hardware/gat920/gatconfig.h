@@ -258,4 +258,7 @@ u8   GAT_EventFrameSent(void);											//GAT发送数据后期处理事件
 u8   GAT_EventActiveUpload(void);											//GAT主动上传事件
 void GAT_PollExecution(void);												//处理GAT协议各个事件
 
+void GAT_CarInUploadEnqueue(unsigned char dici_index);							//获取车辆驶入信息
+void GAT_CarOutUploadEnqueue(unsigned char dici_index);						//获取车辆驶离信息
+
 #endif

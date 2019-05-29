@@ -43,7 +43,11 @@
 #include "usrconfig.h"
 #include "lestcconfig.h"
 #include "lestcfunc.h"
-
+#include "socketxunfeiconfig.h"
+#include "socketxunfeifunc.h"
+#include "socketxunfeiinstantia.h"
+#include "socketxunfeiinitialization.h"
+#include "socketxunfeimessage.h"
 
 extern u8 ack_geted;
 extern int SysTick_count;
@@ -59,6 +63,10 @@ u8 						rssi_value[RECV_MAX];							//存储的rssi值
 USHORT 					output_ID[OUTPUT_MAX];							//输出端口的参数
 u8 OUTPUT_NUM;          													//可以使用的输出端口
 u32 Crossid;															//路口代码
+
+#if SOCKET_FUNC_TYPE
+SOCKET_Xunfei_ClientsTypeDef	SocketXunfeiClient;								//Socket Xunfei Client
+#endif
 
 GPIO_TypeDef* OUTPUT_TYPE[16] =											//IO输出引脚
 {
@@ -272,7 +280,11 @@ int main(void)
 	param_recv.software_version		= MVB_SOFTWARE_VERSION;					//软件版本号
 	param_recv.hardware_version		= MVB_HARDWARE_VERSION;					//硬件版本号
 	
+#if SOCKET_FUNC_TYPE
+	SOCKET_Xunfei_GetOutputID(&SocketXunfeiClient, output_ID);					//上电读取output_ID输出端口的参数到SocketXunfei流量数据包
+#else
 	socket_dev.ReadOutputID(output_ID);									//上电读取output_ID输出端口的参数到Socket流量数据包
+#endif
 	socket_extend_dev.ReadOutputID(output_ID);								//上电读取output_ID输出端口的参数到SocketExtend流量数据包
 	socket_modulation_dev.ReadOutputID(output_ID);							//上电读取output_ID输出端口的参数到SocketModulation流量数据包
 	calculation_dev.ReadOutputID(output_ID);								//上电读取output_ID输出端口的参数到Calculation计算数据包
@@ -355,10 +367,22 @@ int main(void)
 	}
 #endif
 	
+#if SOCKET_FUNC_TYPE
+	
+#ifdef SOCKET_XUNFEI_ENABLE
+	if (PlatformSocket == Socket_ENABLE) {									//根据SN选择是否使能SocketXunfei
+		SOCKET_Xunfei_Client_Init(&SocketXunfeiClient);						//根据SN选择是否使能SocketXunfei
+	}
+#endif
+	
+#else
+	
 #ifdef SOCKET_ENABLE													//使用Socket
 	if (PlatformSocket == Socket_ENABLE) {									//根据SN选择是否使能Socket
 		socket_dev.Init();
 	}
+#endif
+	
 #endif
 	
 #ifdef SOCKET_EXTEND_ENABLE												//使用SocketExtend
@@ -558,10 +582,6 @@ USHORT hand_simple_data(void)
 //处理IO数据输出
 void hand_IOOutput(u8* buf)
 {
-#ifdef GAT920_ENABLE
-	u8 x = 0;
-	u8 y = 0;
-#endif
 	int i;
 	u16 carnumstate = 0;
 	RF_DataHeader_TypeDef header;
@@ -577,17 +597,6 @@ void hand_IOOutput(u8* buf)
 		{
 			if ((output_ID[i] == (header.addr_dev)) || (output_ID[i] == 0xFFFF))
 			{
-#ifdef GAT920_ENABLE
-				if (PlatformGat920 == Gat920_ENABLE) {											//根据SN选择是否使能GAT920
-					if (GATConnect == GAT_ONLINE) {
-						x = i / 8;
-						y = i % 8;
-						if ((gatParamPulse.pulseUploadBit[x] & (0x01 << y)) != 0) {					//检查脉冲数据上传通道使能位
-							gat920_dev.UploadEnqueue(output_ID[i], GAT_INDETECTIONAREA);
-						}
-					}
-				}
-#endif
 				if (PlatformLESTC == LESTC_DISABLE) {
 					if (i < OUTPUT_NUM) {													//限定于16路输出范围
 						switch (param_recv.output_mode)
@@ -596,6 +605,7 @@ void hand_IOOutput(u8* buf)
 						case 0:
 							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
 								GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+								GAT_CarInUploadEnqueue(i);
 							}
 							else {
 								iooutput_dev.Mode0IOCheck(i, carnumstate, 1);					//跟随车辆输出
@@ -629,6 +639,7 @@ void hand_IOOutput(u8* buf)
 						default :
 							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
 								GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+								GAT_CarInUploadEnqueue(i);
 							}
 							else {
 								iooutput_dev.Mode0IOCheck(i, carnumstate, 1);					//IO输出校验数据 跟随车辆输出
@@ -691,6 +702,7 @@ void hand_IOOutput(u8* buf)
 					}
 				}
 				
+#if (!SOCKET_FUNC_TYPE)
 #ifdef SOCKET_ENABLE
 				if (PlatformSocket == Socket_ENABLE) {											//根据SN选择是否使能Socket
 					if (INTERVALTIME == 0) {
@@ -705,6 +717,7 @@ void hand_IOOutput(u8* buf)
 					}
 				}
 #endif
+#endif
 			}
 		}
 	}
@@ -715,17 +728,6 @@ void hand_IOOutput(u8* buf)
 		{
 			if ((output_ID[i] == (header.addr_dev)) || (output_ID[i] == 0xFFFF))
 			{
-#ifdef GAT920_ENABLE
-				if (PlatformGat920 == Gat920_ENABLE) {											//根据SN选择是否使能GAT920
-					if (GATConnect == GAT_ONLINE) {
-						x = i / 8;
-						y = i % 8;
-						if ((gatParamPulse.pulseUploadBit[x] & (0x01 << y)) != 0) {					//检查脉冲数据上传通道使能位
-							gat920_dev.UploadEnqueue(output_ID[i], GAT_OUTDETECTIONAREA);
-						}
-					}
-				}
-#endif
 				if (PlatformLESTC == LESTC_DISABLE) {
 					if (i < OUTPUT_NUM) {													//限定于16路输出范围
 						switch (param_recv.output_mode)
@@ -734,6 +736,7 @@ void hand_IOOutput(u8* buf)
 						case 0:
 							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
 								GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+								GAT_CarOutUploadEnqueue(i);
 							}
 							else {
 								iooutput_dev.Mode0IOCheck(i, carnumstate, 0);					//IO输出校验数据 跟随车辆输出
@@ -767,6 +770,7 @@ void hand_IOOutput(u8* buf)
 						default :
 							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
 								GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+								GAT_CarOutUploadEnqueue(i);
 							}
 							else {
 								iooutput_dev.Mode0IOCheck(i, carnumstate, 0);					//IO输出校验数据 跟随车辆输出
@@ -829,6 +833,7 @@ void hand_IOOutput(u8* buf)
 					}
 				}
 				
+#if (!SOCKET_FUNC_TYPE)
 #ifdef SOCKET_ENABLE
 				if (PlatformSocket == Socket_ENABLE) {											//根据SN选择是否使能Socket
 					if (INTERVALTIME == 0) {
@@ -842,6 +847,7 @@ void hand_IOOutput(u8* buf)
 						}
 					}
 				}
+#endif
 #endif
 			}
 		}
@@ -972,6 +978,7 @@ void init_param_recv_default(u32 sn, u32 crossid)
 	param_recv.simple_mode 			= 1;									//RT数据模式是否是简单模式
 	param_recv.software_version		= MVB_SOFTWARE_VERSION;					//软件版本号
 	param_recv.hardware_version		= MVB_HARDWARE_VERSION;					//硬件版本号
+	param_recv.dirverway_config		= 0x4444;								//Dirverway Config Socket
 
 	param_wvd_cfg.addr_dev 			= 0xffff;								//检测器序列号
 	param_wvd_cfg.config_item 		= 0x0;								//配置位
@@ -997,7 +1004,12 @@ void init_param_recv_default(u32 sn, u32 crossid)
 	param_net_cfg.socketA_connect_state= 0;									//SOCKET接口A的连接状态
 
 	memset(output_ID, 0x0, 2 * OUTPUT_MAX);
+	
+#if SOCKET_FUNC_TYPE
+	SOCKET_Xunfei_GetOutputID(&SocketXunfeiClient, output_ID);					//读取output_ID输出端口的参数到SocketXunfei流量数据包
+#else
 	socket_dev.ReadOutputID(output_ID);									//读取output_ID输出端口的参数到Socket流量数据包
+#endif
 	socket_extend_dev.ReadOutputID(output_ID);								//读取output_ID输出端口的参数到SocketExtend流量数据包
 	socket_modulation_dev.ReadOutputID(output_ID);							//读取output_ID输出端口的参数到SocketModulation流量数据包
 	calculation_dev.ReadOutputID(output_ID);								//读取output_ID输出端口的参数到Calculation计算数据包
@@ -1116,6 +1128,10 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegi
 				case REG_RO_CROSSID_L:
 					*pucRegBuffer++ = ( unsigned char )( param_recv.crossid_L>> 8);
 	                		*pucRegBuffer++ = ( unsigned char )( param_recv.crossid_L & 0xff);
+					break;
+				case  REG_RW_DIRVERWAY_CONFIG:
+					*pucRegBuffer++ = ( unsigned char )( param_recv.dirverway_config>> 8);
+						*pucRegBuffer++ = ( unsigned char )( param_recv.dirverway_config & 0xff);
 					break;
 				case  REG_RW_WVD_ID:
 					*pucRegBuffer++ = ( unsigned char )( param_wvd_cfg.addr_dev>> 8);
@@ -1282,6 +1298,11 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegi
 					pucRegBuffer++;
 	                		rtc_system_time |= *pucRegBuffer++;
 					break;
+				case  REG_RW_DIRVERWAY_CONFIG:
+					param_recv.dirverway_config = *pucRegBuffer << 8;
+					pucRegBuffer++;
+						param_recv.dirverway_config |= *pucRegBuffer++;
+					break;
 				case  REG_RW_WVD_ID:
 					param_wvd_cfg.addr_dev = *pucRegBuffer << 8;
 					pucRegBuffer++;
@@ -1395,7 +1416,11 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegi
 				usNRegs--;
 			}
 			param_save_to_flash();
+#if SOCKET_FUNC_TYPE
+			SOCKET_Xunfei_GetOutputID(&SocketXunfeiClient, output_ID);			//读取output_ID输出端口的参数到SocketXunfei流量数据包
+#else
 			socket_dev.ReadOutputID(output_ID);							//读取output_ID输出端口的参数到Socket流量数据包
+#endif
 			socket_extend_dev.ReadOutputID(output_ID);						//读取output_ID输出端口的参数到SocketExtend流量数据包
 			socket_modulation_dev.ReadOutputID(output_ID);					//读取output_ID输出端口的参数到SocketModulation流量数据包
 			calculation_dev.ReadOutputID(output_ID);						//读取output_ID输出端口的参数到Calculation计算数据包
@@ -1427,7 +1452,11 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegi
 				usNRegs--;
 			}
 			param_save_to_flash();
+#if SOCKET_FUNC_TYPE
+			SOCKET_Xunfei_GetOutputID(&SocketXunfeiClient, output_ID);			//读取output_ID输出端口的参数到SocketXunfei流量数据包
+#else
 			socket_dev.ReadOutputID(output_ID);							//读取output_ID输出端口的参数到Socket流量数据包
+#endif
 			socket_extend_dev.ReadOutputID(output_ID);						//读取output_ID输出端口的参数到SocketExtend流量数据包
 			socket_modulation_dev.ReadOutputID(output_ID);					//读取output_ID输出端口的参数到SocketModulation流量数据包
 			calculation_dev.ReadOutputID(output_ID);						//读取output_ID输出端口的参数到Calculation计算数据包

@@ -300,6 +300,8 @@ u32 SOCKET_GetDateTime(u16 outputid)
 	return datetime;
 }
 
+static u16 volumeValIdentical = 0;
+
 /**********************************************************************************************************
  @Function			u16 SOCKET_GatVolume(u16 outputid)
  @Description			例化获取Volume一分中内通过的车辆
@@ -311,6 +313,8 @@ u16 SOCKET_GetVolume(u16 outputid)
 	u16 volumeval = 0;
 	
 	volumeval = calculation_dev.ReadVolume(outputid);
+	
+	volumeValIdentical = volumeval;
 	
 	return volumeval;
 }
@@ -334,7 +338,11 @@ u16 SOCKET_GetVolume1(u16 outputid)
 **********************************************************************************************************/
 u16 SOCKET_GetVolume2(u16 outputid)
 {
-	return 0;
+	u16 volumeval = 0;
+	
+	volumeval = volumeValIdentical;
+	
+	return volumeval;
 }
 
 /**********************************************************************************************************

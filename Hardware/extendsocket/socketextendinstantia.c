@@ -413,7 +413,7 @@ u16 SOCKET_Extend_GetDataLength(Socket_Extend_Packet_Data *addr)
 		}
 	}
 	
-	datalength *= 113;
+	datalength *= 112;
 	
 	return datalength;
 }
@@ -488,6 +488,8 @@ u32 SOCKET_Extend_GetSendTime(u16 outputid)
 	return datetime;
 }
 
+static u16 vehicleCountIdentical = 0;
+
 /**********************************************************************************************************
  @Function			u16 SOCKET_Extend_GetVehicleCount(u16 outputid)
  @Description			例化获取VehicleCount车流量
@@ -499,6 +501,8 @@ u16 SOCKET_Extend_GetVehicleCount(u16 outputid)
 	u16 vehicleCount = 0;
 	
 	vehicleCount = calculation_dev.ReadVolume(outputid);
+	
+	vehicleCountIdentical = vehicleCount;
 	
 	return vehicleCount;
 }
@@ -533,7 +537,11 @@ u16 SOCKET_Extend_GetMidVehicleCount(u16 outputid)
 **********************************************************************************************************/
 u16 SOCKET_Extend_GetSmallVehilceCount(u16 outputid)
 {
-	return 0;
+	u16 vehicleCount = 0;
+	
+	vehicleCount = vehicleCountIdentical;
+	
+	return vehicleCount;
 }
 
 /**********************************************************************************************************
@@ -943,39 +951,51 @@ u32 SOCKET_Extend_GetDirverWayCode(u16 outputid, u16 inlen)
 	u8 i = 0;
 	u16 laneno = 101;
 	
+	u8 westNum  = (param_recv.dirverway_config & 0x000F) >>  0;
+	u8 southNum = (param_recv.dirverway_config & 0x00F0) >>  4;
+	u8 eastNum  = (param_recv.dirverway_config & 0x0F00) >>  8;
+	u8 northNum = (param_recv.dirverway_config & 0xF000) >> 12;
+	
+	if ((westNum + southNum + eastNum + northNum) > 16) {
+		westNum  = 4;
+		southNum = 4;
+		eastNum  = 4;
+		northNum = 4;
+	}
+	
 	for (i = 0; i < OUTPUT_MAX; i++) {
 		if (SocketExtendDataPacket[i].OutputID == outputid) {
 			i = inlen;
-			if (i <= 3) {
+			if (i < westNum) {
 				laneno = i + 1 + 100;
 				break;
 			}
-			else if ((i >= 4) && (i <= 7)) {
-				laneno = i + 1 + 200 - 4;
+			else if ((i >= westNum) && (i < (westNum + southNum))) {
+				laneno = i + 1 + 200 - westNum;
 				break;
 			}
-			else if ((i >= 8) && (i <= 11)) {
-				laneno = i + 1 + 300 - 8;
+			else if ((i >= (westNum + southNum)) && (i < (westNum + southNum + eastNum))) {
+				laneno = i + 1 + 300 - westNum - southNum;
 				break;
 			}
-			else if ((i >= 12) && (i <= 15)) {
-				laneno = i + 1 + 400 - 12;
+			else if ((i >= (westNum + southNum + eastNum)) && (i < (westNum + southNum + eastNum + northNum))) {
+				laneno = i + 1 + 400 - westNum - southNum - eastNum;
 				break;
 			}
-			else if ((i >= 16) && (i <= 19)) {
-				laneno = i + 1 + 100 - 12;
+			else if ((i >= 16) && (i < (16 + westNum))) {
+				laneno = i + 1 + 100 - (16 - westNum);
 				break;
 			}
-			else if ((i >= 20) && (i <= 23)) {
-				laneno = i + 1 + 200 - 16;
+			else if ((i >= (16 + westNum)) && (i < (16 + westNum + southNum))) {
+				laneno = i + 1 + 200 - (16 + westNum - southNum);
 				break;
 			}
-			else if ((i >= 24) && (i <= 27)) {
-				laneno = i + 1 + 300 - 20;
+			else if ((i >= (16 + westNum + southNum)) && (i < (16 + westNum + southNum + eastNum))) {
+				laneno = i + 1 + 300 - (16 + westNum + southNum - eastNum);
 				break;
 			}
-			else if ((i >= 28) && (i <= 31)) {
-				laneno = i + 1 + 400 - 24;
+			else if ((i >= (16 + westNum + southNum + eastNum)) && (i < (16 + westNum + southNum + eastNum + northNum))) {
+				laneno = i + 1 + 400 - (16 + westNum + southNum + eastNum - northNum);
 				break;
 			}
 		}

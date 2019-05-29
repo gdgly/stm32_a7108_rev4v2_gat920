@@ -13,6 +13,7 @@
   */
 
 #include "lestcfunc.h"
+#include "gatconfig.h"
 
 /**********************************************************************************************************
  @Function			unsigned char LestcGetCheckCode(LestcPacketDataTypeDef* PacketData)
@@ -41,6 +42,8 @@ void LestcCarInSetStatus(LestcPacketDataTypeDef* PacketData, unsigned char statu
 {
 	unsigned int carStatus = 0x00000001;
 	
+	GAT_CarInUploadEnqueue(status);
+	
 	carStatus = carStatus << status;
 	
 	PacketData->CarStatus[0] |= (carStatus & 0x000000FF);
@@ -59,6 +62,8 @@ void LestcCarInSetStatus(LestcPacketDataTypeDef* PacketData, unsigned char statu
 void LestcCarOutSetStatus(LestcPacketDataTypeDef* PacketData, unsigned char status)
 {
 	unsigned int carStatus = 0x00000001;
+	
+	GAT_CarOutUploadEnqueue(status);
 	
 	carStatus = ~(carStatus << status);
 	

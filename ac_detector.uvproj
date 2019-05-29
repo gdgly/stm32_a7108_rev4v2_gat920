@@ -354,7 +354,7 @@
             <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>0</OneElfS>
+            <OneElfS>1</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
@@ -363,7 +363,7 @@
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
@@ -377,7 +377,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\Hardware\a7108;.\Hardware\driver;.\Hardware\modbus;.\Hardware\nrf24l01;.\Libraries\library2008\inc;.\User;.\Hardware\rtc;.\Hardware\usart;.\Hardware\gat920;.\Hardware\tcpsocket;.\Hardware\extendsocket;.\Hardware\modulationsocket;.\Hardware\calculation;.\Hardware\iooutput;.\Hardware\usr;.\Hardware\lestc</IncludePath>
+              <IncludePath>.\Hardware\a7108;.\Hardware\driver;.\Hardware\modbus;.\Hardware\nrf24l01;.\Libraries\library2008\inc;.\User;.\Hardware\rtc;.\Hardware\usart;.\Hardware\gat920;.\Hardware\tcpsocket;.\Hardware\extendsocket;.\Hardware\modulationsocket;.\Hardware\xunfeisocket;.\Hardware\calculation;.\Hardware\iooutput;.\Hardware\usr;.\Hardware\lestc;.\Hardware\FifoMessage</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -744,6 +744,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>FifoMessage</GroupName>
+          <Files>
+            <File>
+              <FileName>fifomessage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\FifoMessage\fifomessage.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>socket</GroupName>
           <Files>
             <File>
@@ -820,6 +830,41 @@
               <FileName>socketmodulationinstantia.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\modulationsocket\socketmodulationinstantia.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>socketxunfei</GroupName>
+          <Files>
+            <File>
+              <FileName>socketxunfeiconfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\xunfeisocket\socketxunfeiconfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketxunfeiinitialization.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\xunfeisocket\socketxunfeiinitialization.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketxunfeifunc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\xunfeisocket\socketxunfeifunc.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketxunfeiinstantia.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\xunfeisocket\socketxunfeiinstantia.c</FilePath>
+            </File>
+            <File>
+              <FileName>socketxunfeimessage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\xunfeisocket\socketxunfeimessage.c</FilePath>
+            </File>
+            <File>
+              <FileName>sock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\xunfeisocket\sock.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -910,6 +955,13 @@
         </Group>
         <Group>
           <GroupName>ReadMe</GroupName>
+          <Files>
+            <File>
+              <FileName>Readme.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Readme.md</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>

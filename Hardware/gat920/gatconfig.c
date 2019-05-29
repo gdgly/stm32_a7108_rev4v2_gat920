@@ -670,4 +670,54 @@ struct _m_gat920_dev gat920_dev =
 	GAT_ImplementEnqueue,														//到达统计时间将统计数据存入队列
 };
 
+extern unsigned short output_ID[OUTPUT_MAX];
+
+/**********************************************************************************************************
+ @Function			void GAT_CarInUploadEnqueue(unsigned char dici_index)
+ @Description			GAT_CarInUploadEnqueue	: 获取车辆驶入信息
+ @Input				dici_index			: 0 ~ 31车辆号
+ @Return				void
+**********************************************************************************************************/
+void GAT_CarInUploadEnqueue(unsigned char dici_index)
+{
+#ifdef GAT920_ENABLE
+	u8 xx = 0;
+	u8 yy = 0;
+	
+	if (PlatformGat920 == Gat920_ENABLE) {
+		if (GATConnect == GAT_ONLINE) {
+			xx = dici_index / 8;
+			yy = dici_index % 8;
+			if ((gatParamPulse.pulseUploadBit[xx] & (0x01 << yy)) != 0) {
+				gat920_dev.UploadEnqueue(output_ID[dici_index], GAT_INDETECTIONAREA);
+			}
+		}
+	}
+#endif
+}
+
+/**********************************************************************************************************
+ @Function			void GAT_CarOutUploadEnqueue(unsigned char dici_index)
+ @Description			GAT_CarOutUploadEnqueue	: 获取车辆驶离信息
+ @Input				dici_index			: 0 ~ 31车辆号
+ @Return				void
+**********************************************************************************************************/
+void GAT_CarOutUploadEnqueue(unsigned char dici_index)
+{
+#ifdef GAT920_ENABLE
+	u8 xx = 0;
+	u8 yy = 0;
+	
+	if (PlatformGat920 == Gat920_ENABLE) {
+		if (GATConnect == GAT_ONLINE) {
+			xx = dici_index / 8;
+			yy = dici_index % 8;
+			if ((gatParamPulse.pulseUploadBit[xx] & (0x01 << yy)) != 0) {
+				gat920_dev.UploadEnqueue(output_ID[dici_index], GAT_OUTDETECTIONAREA);
+			}
+		}
+	}
+#endif
+}
+
 /********************************************** END OF FLEE **********************************************/
