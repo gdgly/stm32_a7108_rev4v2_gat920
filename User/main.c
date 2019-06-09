@@ -168,6 +168,10 @@ u16 rtc_minute_cnt = 0;													//时钟定时器，一个计数表示一分钟
 u16 rtc_second_cnt = 0;													//时钟定时器，一个计数表示一秒钟
 u16 rtc_reset_time = 0;													//重启时间值，当设定时间内没收到数据则重启设备
 u32 recv_sn;
+u32 systime_runtime_ms1 = 0;
+u16 systime_time_meter1 = 0;
+u32 systime_runtime_ms2 = 0;
+u16 systime_time_meter2 = 0;
 
 int main(void)
 {
@@ -598,54 +602,56 @@ void hand_IOOutput(u8* buf)
 			if ((output_ID[i] == (header.addr_dev)) || (output_ID[i] == 0xFFFF))
 			{
 				if (PlatformLESTC == LESTC_DISABLE) {
-					if (i < OUTPUT_NUM) {													//限定于16路输出范围
-						switch (param_recv.output_mode)
-						{
-						//输出方式0 : 跟随车辆输出
-						case 0:
-							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
+					switch (param_recv.output_mode)
+					{
+					//输出方式0 : 跟随车辆输出
+					case 0:
+						if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
+							if (i < OUTPUT_NUM) {
 								GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
-								GAT_CarInUploadEnqueue(i);
 							}
-							else {
-								iooutput_dev.Mode0IOCheck(i, carnumstate, 1);					//跟随车辆输出
-							}
-							break;
-						//输出方式1 : 车辆进入输出固定时长(记数)
-						case 1:
-							iooutput_dev.Mode1IOCheck(i, carnumstate, 1);						//车辆进入输出固定时长(记数)
-							break;
-						//输出方式2 : 车辆离开输出固定时长(记数)
-						case 2:
-							//NULL
-							break;
-						//输出方式3 : 车辆进入,离开时都输出固定时长(记数)
-						case 3:
-							iooutput_dev.Mode3IOCheck(i, carnumstate, 1);						//车辆进入,离开时都输出固定时长(记数)
-							break;
-						//输出方式4 : 车辆进入输出固定时长(不记数)
-						case 4:
-							iooutput_dev.Mode4IOCheck(i, carnumstate, 1);						//车辆进入输出固定时长(不记数)
-							break;
-						//输出方式5 : 车辆离开输出固定时长(不记数)
-						case 5:
-							//NULL
-							break;
-						//输出方式6 : 车辆进入,离开时都输出固定时长(不记数)
-						case 6:
-							iooutput_dev.Mode6IOCheck(i, carnumstate, 1);						//车辆进入,离开时都输出固定时长(不记数)
-							break;
-						//默认 输出方式0 : 跟随车辆输出
-						default :
-							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
-								GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
-								GAT_CarInUploadEnqueue(i);
-							}
-							else {
-								iooutput_dev.Mode0IOCheck(i, carnumstate, 1);					//IO输出校验数据 跟随车辆输出
-							}
-							break;
+							GAT_CarInUploadEnqueue(i);
 						}
+						else {
+							iooutput_dev.Mode0IOCheck(i, carnumstate, 1);					//跟随车辆输出
+						}
+						break;
+					//输出方式1 : 车辆进入输出固定时长(记数)
+					case 1:
+						iooutput_dev.Mode1IOCheck(i, carnumstate, 1);						//车辆进入输出固定时长(记数)
+						break;
+					//输出方式2 : 车辆离开输出固定时长(记数)
+					case 2:
+						//NULL
+						break;
+					//输出方式3 : 车辆进入,离开时都输出固定时长(记数)
+					case 3:
+						iooutput_dev.Mode3IOCheck(i, carnumstate, 1);						//车辆进入,离开时都输出固定时长(记数)
+						break;
+					//输出方式4 : 车辆进入输出固定时长(不记数)
+					case 4:
+						iooutput_dev.Mode4IOCheck(i, carnumstate, 1);						//车辆进入输出固定时长(不记数)
+						break;
+					//输出方式5 : 车辆离开输出固定时长(不记数)
+					case 5:
+						//NULL
+						break;
+					//输出方式6 : 车辆进入,离开时都输出固定时长(不记数)
+					case 6:
+						iooutput_dev.Mode6IOCheck(i, carnumstate, 1);						//车辆进入,离开时都输出固定时长(不记数)
+						break;
+					//默认 输出方式0 : 跟随车辆输出
+					default :
+						if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
+							if (i < OUTPUT_NUM) {
+								GPIO_SetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+							}
+							GAT_CarInUploadEnqueue(i);
+						}
+						else {
+							iooutput_dev.Mode0IOCheck(i, carnumstate, 1);					//IO输出校验数据 跟随车辆输出
+						}
+						break;
 					}
 				}
 				else {
@@ -729,54 +735,56 @@ void hand_IOOutput(u8* buf)
 			if ((output_ID[i] == (header.addr_dev)) || (output_ID[i] == 0xFFFF))
 			{
 				if (PlatformLESTC == LESTC_DISABLE) {
-					if (i < OUTPUT_NUM) {													//限定于16路输出范围
-						switch (param_recv.output_mode)
-						{
-						//输出方式0 : 跟随车辆输出
-						case 0:
-							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
+					switch (param_recv.output_mode)
+					{
+					//输出方式0 : 跟随车辆输出
+					case 0:
+						if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
+							if (i < OUTPUT_NUM) {
 								GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
-								GAT_CarOutUploadEnqueue(i);
 							}
-							else {
-								iooutput_dev.Mode0IOCheck(i, carnumstate, 0);					//IO输出校验数据 跟随车辆输出
-							}
-							break;
-						//输出方式1 : 车辆进入输出固定时长(记数)
-						case 1:
-							//NULL
-							break;
-						//输出方式2 : 车辆离开输出固定时长(记数)
-						case 2:
-							iooutput_dev.Mode2IOCheck(i, carnumstate, 0);						//车辆离开输出固定时长(记数)
-							break;
-						//输出方式3 : 车辆进入,离开时都输出固定时长(记数)
-						case 3:
-							iooutput_dev.Mode3IOCheck(i, carnumstate, 0);						//车辆进入,离开时都输出固定时长(记数)
-							break;
-						//输出方式4 : 车辆进入输出固定时长(不记数)
-						case 4:
-							//NULL
-							break;
-						//输出方式5 : 车辆离开输出固定时长(不记数)
-						case 5:
-							iooutput_dev.Mode5IOCheck(i, carnumstate, 0);						//车辆离开输出固定时长(不记数)
-							break;
-						//输出方式6 : 车辆进入,离开时都输出固定时长(不记数)
-						case 6:
-							iooutput_dev.Mode6IOCheck(i, carnumstate, 0);						//车辆进入,离开时都输出固定时长(不记数)
-							break;
-						//默认 输出方式0 : 跟随车辆输出
-						default :
-							if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
-								GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
-								GAT_CarOutUploadEnqueue(i);
-							}
-							else {
-								iooutput_dev.Mode0IOCheck(i, carnumstate, 0);					//IO输出校验数据 跟随车辆输出
-							}
-							break;
+							GAT_CarOutUploadEnqueue(i);
 						}
+						else {
+							iooutput_dev.Mode0IOCheck(i, carnumstate, 0);					//IO输出校验数据 跟随车辆输出
+						}
+						break;
+					//输出方式1 : 车辆进入输出固定时长(记数)
+					case 1:
+						//NULL
+						break;
+					//输出方式2 : 车辆离开输出固定时长(记数)
+					case 2:
+						iooutput_dev.Mode2IOCheck(i, carnumstate, 0);						//车辆离开输出固定时长(记数)
+						break;
+					//输出方式3 : 车辆进入,离开时都输出固定时长(记数)
+					case 3:
+						iooutput_dev.Mode3IOCheck(i, carnumstate, 0);						//车辆进入,离开时都输出固定时长(记数)
+						break;
+					//输出方式4 : 车辆进入输出固定时长(不记数)
+					case 4:
+						//NULL
+						break;
+					//输出方式5 : 车辆离开输出固定时长(不记数)
+					case 5:
+						iooutput_dev.Mode5IOCheck(i, carnumstate, 0);						//车辆离开输出固定时长(不记数)
+						break;
+					//输出方式6 : 车辆进入,离开时都输出固定时长(不记数)
+					case 6:
+						iooutput_dev.Mode6IOCheck(i, carnumstate, 0);						//车辆进入,离开时都输出固定时长(不记数)
+						break;
+					//默认 输出方式0 : 跟随车辆输出
+					default :
+						if (param_recv.handle_lost != 1) {									//判断是否需要对丢包处理
+							if (i < OUTPUT_NUM) {
+								GPIO_ResetBits(OUTPUT_TYPE[i],  OUTPUT_PIN[i]);
+							}
+							GAT_CarOutUploadEnqueue(i);
+						}
+						else {
+							iooutput_dev.Mode0IOCheck(i, carnumstate, 0);					//IO输出校验数据 跟随车辆输出
+						}
+						break;
 					}
 				}
 				else {

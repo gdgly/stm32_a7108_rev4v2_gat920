@@ -60,6 +60,9 @@ GATConnectType				GATConnect = GAT_OFFLINE;						//GAT连接状态
 GATUPLOADAckType			GATUPLOADAck = GAT_ReceivedAck;					//GAT上传数据接收应答状态
 GATActiveUpLoadModeType		GATActiveUpLoadMode = GAT_ActiveUpLoadMode_NONE;		//GAT主动上传模式
 
+u8 GAT_USART_RXIT = 0;
+u8 GAT_USART_TXIT = 0;
+
 /**********************************************************************************************************
  @Function			void GAT_FlashErase(u32 StartAddr)
  @Description			擦除GAT参数存储Flash区
@@ -259,10 +262,14 @@ u8 GAT_EventInitialized(void)
 	
 	if (Initialized != GAT_FALSE) {
 		GATEvent = GAT_EVENT_READY;													//进入READY事件
+		GAT_USART_RXIT = 1;
+		GAT_USART_TXIT = 0;
 		GAT_PortSerialEnable(1, 0);													//开启接收中断
 	}
 	else {
 		GATEvent = GAT_EVENT_INITIALIZED;												//进入INITIALIZED事件
+		GAT_USART_RXIT = 0;
+		GAT_USART_TXIT = 0;
 		GAT_PortSerialEnable(0, 0);													//关闭串口中断
 	}
 	
@@ -280,28 +287,63 @@ u8 GAT_EventReady(void)
 {
 	u8 error = GAT_TRUE;
 	
+	if ((GAT_USART_RXIT != 1) && (GAT_USART_TXIT != 1)) {
+		GAT_USART_RXIT = 1;
+		GAT_USART_TXIT = 0;
+		GAT_PortSerialEnable(1, 0);													//开启接收中断
+	}
+	
 	/* 主线查询/设置事件 */
 	if (GATReceiveLength & 0X8000) {													//接收到一帧串口数据
+		GAT_USART_RXIT = 0;
+		GAT_USART_TXIT = 0;
 		GAT_PortSerialEnable(0, 0);													//关闭串口中断
 		GATEvent = GAT_EVENT_FRAME_RECEIVED;											//进入FRAME_RECEIVED事件
+		goto exit;
 	}
-	/* 支线脉冲数据主动上传 */
-	else if ((GAT_UploadQueueisEmpty() == 0) && (GATUPLOADAck != GAT_NotReceivedAck)) {			//脉冲数据上传队列有待处理数据且无需等待主动上传应答
-		GAT_PortSerialEnable(0, 0);													//关闭串口中断
-		GATActiveUpLoadMode = GAT_ActiveUpLoadMode_PULSE;									//脉冲数据主动上传
-		GATEvent = GAT_EVENT_ACTIVEUPLOAD;												//进入ACTIVEUPLOAD事件
-	}
-	/* 支线统计数据主动上传 */
-	else if ((GAT_StatisticalQueueisEmpty() == 0) && (GATUPLOADAck != GAT_NotReceivedAck)) {		//统计数据上传队列有待处理数据且无需等待主动上传应答
-		GAT_PortSerialEnable(0, 0);													//关闭串口中断
-		GATActiveUpLoadMode = GAT_ActiveUpLoadMode_STATISTICS;								//统计数据主动上传
-		GATEvent = GAT_EVENT_ACTIVEUPLOAD;												//进入ACTIVEUPLOAD事件
+	
+	if (GATConnect != GAT_OFFLINE) {
+		/* 支线脉冲数据主动上传 */
+		if ((GAT_UploadQueueisEmpty() == 0) && (GATUPLOADAck != GAT_NotReceivedAck)) {				//脉冲数据上传队列有待处理数据且无需等待主动上传应答
+			//delay_1ms(GAT920_UPLOAD_SEND_DELAY_MS);
+			if (systime_time_meter1 != 1) {
+				systime_time_meter1 = 1;
+				systime_runtime_ms1 = 0;
+			}
+			if (systime_runtime_ms1 >= GAT920_UPLOAD_SEND_DELAY_MS) {
+				systime_time_meter1 = 0;
+				systime_runtime_ms1 = 0;
+				GAT_USART_RXIT = 0;
+				GAT_USART_TXIT = 0;
+				GAT_PortSerialEnable(0, 0);													//关闭串口中断
+				GATActiveUpLoadMode = GAT_ActiveUpLoadMode_PULSE;									//脉冲数据主动上传
+				GATEvent = GAT_EVENT_ACTIVEUPLOAD;												//进入ACTIVEUPLOAD事件
+			}
+		}
+		/* 支线统计数据主动上传 */
+		else if ((GAT_StatisticalQueueisEmpty() == 0) && (GATUPLOADAck != GAT_NotReceivedAck)) {		//统计数据上传队列有待处理数据且无需等待主动上传应答
+			//delay_1ms(GAT920_UPLOAD_SEND_DELAY_MS);
+			if (systime_time_meter2 != 1) {
+				systime_time_meter2 = 1;
+				systime_runtime_ms2 = 0;
+			}
+			if (systime_runtime_ms2 >= GAT920_UPLOAD_SEND_DELAY_MS) {
+				systime_time_meter2 = 0;
+				systime_runtime_ms2 = 0;
+				GAT_USART_RXIT = 0;
+				GAT_USART_TXIT = 0;
+				GAT_PortSerialEnable(0, 0);													//关闭串口中断
+				GATActiveUpLoadMode = GAT_ActiveUpLoadMode_STATISTICS;								//统计数据主动上传
+				GATEvent = GAT_EVENT_ACTIVEUPLOAD;												//进入ACTIVEUPLOAD事件
+			}
+		}
 	}
 	/* 空闲事件 */
 	else {
 		GATEvent = GAT_EVENT_READY;													//进入READY事件
 	}
 	
+exit:
 	return error;
 }
 
@@ -323,6 +365,8 @@ u8 GAT_EventFrameReceived(void)
 		memset((u8 *)&GATReceiveBuf, 0x0, sizeof(GATReceiveBuf));							//清空接收数据缓存区
 		GATReceiveLength = 0;														//接收数据长度清0
 		GATEvent = GAT_EVENT_READY;													//进入READY事件
+		GAT_USART_RXIT = 1;
+		GAT_USART_TXIT = 0;
 		GAT_PortSerialEnable(1, 0);													//开启接收中断
 		return GAT_FALSE;
 	}
@@ -332,6 +376,8 @@ u8 GAT_EventFrameReceived(void)
 		memset((u8 *)&GATReceiveBuf, 0x0, sizeof(GATReceiveBuf));							//清空接收数据缓存区
 		GATReceiveLength = 0;														//接收数据长度清0
 		GATEvent = GAT_EVENT_READY;													//进入READY事件
+		GAT_USART_RXIT = 1;
+		GAT_USART_TXIT = 0;
 		GAT_PortSerialEnable(1, 0);													//开启接收中断
 		return GAT_FALSE;
 	}
@@ -374,6 +420,8 @@ u8 GAT_EventExecute(void)
 			GATReceiveLength = 0;													//接收数据长度清0
 			GATSendLength = 0;														//发送数据长度清0
 			GATEvent = GAT_EVENT_READY;												//进入READY事件
+			GAT_USART_RXIT = 1;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(1, 0);												//开启接收中断
 			return GAT_FALSE;
 		}
@@ -420,6 +468,8 @@ u8 GAT_EventExecute(void)
 			GATReceiveLength = 0;													//接收数据长度清0
 			GATSendLength = 0;														//发送数据长度清0
 			GATEvent = GAT_EVENT_READY;												//进入READY事件
+			GAT_USART_RXIT = 1;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(1, 0);												//开启接收中断
 			return GAT_TRUE;
 		}
@@ -430,6 +480,8 @@ u8 GAT_EventExecute(void)
 			GATReceiveLength = 0;													//接收数据长度清0
 			GATSendLength = 0;														//发送数据长度清0
 			GATEvent = GAT_EVENT_READY;												//进入READY事件
+			GAT_USART_RXIT = 1;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(1, 0);												//开启接收中断
 			return GAT_FALSE;
 		}
@@ -439,6 +491,8 @@ u8 GAT_EventExecute(void)
 		memset((u8 *)&GATReceiveBuf, 0x0, sizeof(GATReceiveBuf));							//清空接收数据缓存区
 		GATReceiveLength = 0;														//接收数据长度清0
 		GATEvent = GAT_EVENT_READY;													//进入READY事件
+		GAT_USART_RXIT = 1;
+		GAT_USART_TXIT = 0;
 		GAT_PortSerialEnable(1, 0);													//开启接收中断
 		return GAT_FALSE;
 	}
@@ -463,6 +517,8 @@ u8 GAT_EventFrameSent(void)
 			GATSendLength = framelength;												//传递数据帧长度
 			sending = 1;															//标记发送数据中
 			GATEvent = GAT_EVENT_FRAME_SENT;											//进入SENT事件
+			GAT_USART_RXIT = 0;
+			GAT_USART_TXIT = 1;
 			GAT_PortSerialEnable(0, 1);												//开启发送中断
 			return GAT_TRUE;
 		}
@@ -473,12 +529,16 @@ u8 GAT_EventFrameSent(void)
 			GATReceiveLength = 0;													//接收数据长度清0
 			GATSendLength = 0;														//发送数据长度清0
 			GATEvent = GAT_EVENT_READY;												//进入READY事件
+			GAT_USART_RXIT = 1;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(1, 0);												//开启接收中断
 			return GAT_FALSE;
 		}
 	}
 	else {																		//发送数据中
 		if (GATSendLength & 0X8000) {													//发送完一帧数据
+			GAT_USART_RXIT = 0;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(0, 0);												//关闭串口中断
 			sending = 0;															//标记无数据发送中
 			memset((u8 *)&GATReceiveBuf, 0x0, sizeof(GATReceiveBuf));						//清空接收数据缓存区
@@ -486,6 +546,8 @@ u8 GAT_EventFrameSent(void)
 			GATReceiveLength = 0;													//接收数据长度清0
 			GATSendLength = 0;														//发送数据长度清0
 			GATEvent = GAT_EVENT_READY;												//进入READY事件
+			GAT_USART_RXIT = 1;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(1, 0);												//开启接收中断
 			return GAT_TRUE;
 		}
@@ -526,6 +588,8 @@ u8 GAT_EventActiveUpload(void)
 			GATReceiveLength = 0;													//接收数据长度清0
 			GATSendLength = 0;														//发送数据长度清0
 			GATEvent = GAT_EVENT_READY;												//进入READY事件
+			GAT_USART_RXIT = 1;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(1, 0);												//开启接收中断
 			return GAT_FALSE;
 		}
@@ -548,6 +612,8 @@ u8 GAT_EventActiveUpload(void)
 			GATReceiveLength = 0;													//接收数据长度清0
 			GATSendLength = 0;														//发送数据长度清0
 			GATEvent = GAT_EVENT_READY;												//进入READY事件
+			GAT_USART_RXIT = 1;
+			GAT_USART_TXIT = 0;
 			GAT_PortSerialEnable(1, 0);												//开启接收中断
 			return GAT_FALSE;
 		}

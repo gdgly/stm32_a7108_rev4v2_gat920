@@ -45,6 +45,8 @@ extern GATActiveUpLoadModeType GATActiveUpLoadMode;
 
 #define	GAT920_BAUDRATE						9600						//Ä¬ÈÏ²¨ÌØÂÊ
 
+#define	GAT920_UPLOAD_SEND_DELAY_MS				100
+
 #define	GAT_TRUE								0
 #define	GAT_FALSE								1
 #define	GAT_DATAFALSE							2

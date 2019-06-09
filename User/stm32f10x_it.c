@@ -909,6 +909,20 @@ void TIM3_IRQHandler(void)
 		if (PlatformLESTC == LESTC_ENABLE) {								// π”√Lestc
 			LestcSendTimeTick += 1;
 		}
+		
+		if (systime_time_meter1 != 0) {
+			systime_runtime_ms1++;
+		}
+		else {
+			systime_runtime_ms1 = 0;
+		}
+		
+		if (systime_time_meter2 != 0) {
+			systime_runtime_ms2++;
+		}
+		else {
+			systime_runtime_ms2 = 0;
+		}
 	}
 }
 

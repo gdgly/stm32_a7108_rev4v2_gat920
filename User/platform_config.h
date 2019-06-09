@@ -342,7 +342,10 @@ void PlatForm_SnToFunction(u32 SN);										// 根据SN码选择开启对应功能项
 extern mvb_param_recv param_recv;
 extern u8 a7108_initialized;
 extern mvb_param_wvd_config 	param_wvd_cfg;									// 地磁配置数据
-
+extern u32 systime_runtime_ms1;
+extern u16 systime_time_meter1;
+extern u32 systime_runtime_ms2;
+extern u16 systime_time_meter2;
 
 #endif /* __PLATFORM_CONFIG_H */
 

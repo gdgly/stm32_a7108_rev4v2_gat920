@@ -6,8 +6,8 @@
 #include "gatconfig.h"
 
 
-#define		UPLOADQUEUELENGTH		30									//脉冲数据存储队列长度
-#define		STATISTICALLENGTH		10									//统计数据存储队列长度
+#define		UPLOADQUEUELENGTH		50									//脉冲数据存储队列长度
+#define		STATISTICALLENGTH		20									//统计数据存储队列长度
 
 #define		GATOVERTIME			2									//超时时间/秒
 #define		GATREPEAT				3									//重发次数/次
