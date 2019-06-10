@@ -1,6 +1,8 @@
 # stm32F103_A7108_tmote_app_recv
 > ##### Copyright (C) 2019 Movebroad Version:1.18 Design by Movebroad
 
+* 2019-06-10 :
+	* GAT协议脉冲数据发送各个包延时100ms发送。
 * 2019-05-29 :
 	* 修改GAT脉冲数据发送增加地磁数据丢失补包功能。
 * 2019-05-21 :
