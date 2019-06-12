@@ -1,6 +1,8 @@
 # stm32F103_A7108_tmote_app_recv
 > ##### Copyright (C) 2019 Movebroad Version:1.18 Design by Movebroad
 
+* 2019-06-12 :
+	* SocketExtend协议(银江Socket扩展协议)，增加普通流量数据包应答处理，无应答重复发送之前数据，重复次数3次，重复时间5秒。
 * 2019-06-10 :
 	* GAT协议脉冲数据发送各个包延时100ms发送。
 * 2019-05-29 :

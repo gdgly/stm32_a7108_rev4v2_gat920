@@ -231,15 +231,85 @@ void SOCKET_Extend_Implement(u16 sendtime)
 		}
 		/* 对好时间 */
 		else {
-			socketExtendsendnum = 0;
-			socketExtendreceiveflag = 0;
-			socketExtendreceivesendtime = 0;
+			if (socketExtendreceivesendtime >= SOCKET_EXTEND_AGAINSENDTIME) {						//到达检测时间
+				socketExtendreceivesendtime = 0;
+				if (SOCKET_EXTEND_RX_STA & 0X8000) {											//接收到期待的应答结果
+					if (SocketExtendReceiveBuf[1] == (SOCKET_EXTEND_SERVERTYPE_RTCCHECKNONE | SOCKET_EXTEND_SERVERTYPE_CROSS)) {	//接受到数据
+						if (SocketExtendReceiveBuf[16] == 0x99) {
+							socketExtendsendnum = 0;
+							socketExtendreceiveflag = 0;
+							socketExtendreceivesendtime = 0;
+						}
+						else {
+							SOCKET_EXTEND_RX_STA = 0;
+						}
+					}
+					else {
+						SOCKET_EXTEND_RX_STA = 0;
+					}
+				}
+				else {
+					/* 数据发送 */
+#ifdef SOCKETEXTENDUSARTTXIRQn
+					SocketExtendTxDataLangth = socketExtendsendlength;							//获取发送数据长度
+					SocketExtendTxCounter = 0;												//发送地址归0
+					if (SOCKET_EXTEND_USART == USART1) {										//485发送
+						SOCKET_EXTEND_RS485_Mode_TX();
+						Delay(0x1fff);
+					}
+					USART_ITConfig(SOCKET_EXTEND_USART, USART_IT_TXE, ENABLE);									//开发送中断,并进入发送中断发送数据
+#else
+					SOCKET_Extend_USARTSend(SOCKET_EXTEND_USART, (u8 *)SocketExtendSendBuf, socketExtendsendlength);	//发送数据
+#endif
+					socketExtendsendnum += 1;
+					if (socketExtendsendnum >= 3) {
+						socketExtendsendnum = 0;
+						socketExtendreceiveflag = 0;
+						socketExtendreceivesendtime = 0;
+					}
+				}
+			}
 		}
 	}
 	else {
-		socketExtendsendnum = 0;
-		socketExtendreceiveflag = 0;
-		socketExtendreceivesendtime = 0;
+		if (socketExtendreceivesendtime >= SOCKET_EXTEND_AGAINSENDTIME) {							//到达检测时间
+			socketExtendreceivesendtime = 0;
+			if (SOCKET_EXTEND_RX_STA & 0X8000) {												//接收到期待的应答结果
+				if (SocketExtendReceiveBuf[1] == (SOCKET_EXTEND_SERVERTYPE_RTCCHECKNONE | SOCKET_EXTEND_SERVERTYPE_CROSS)) {		//接受到数据
+					if (SocketExtendReceiveBuf[16] == 0x99) {
+						socketExtendsendnum = 0;
+						socketExtendreceiveflag = 0;
+						socketExtendreceivesendtime = 0;
+					}
+					else {
+						SOCKET_EXTEND_RX_STA = 0;
+					}
+				}
+				else {
+					SOCKET_EXTEND_RX_STA = 0;
+				}
+			}
+			else {
+				/* 数据发送 */
+#ifdef SOCKETEXTENDUSARTTXIRQn
+				SocketExtendTxDataLangth = socketExtendsendlength;								//获取发送数据长度
+				SocketExtendTxCounter = 0;													//发送地址归0
+				if (SOCKET_EXTEND_USART == USART1) {											//485发送
+					SOCKET_EXTEND_RS485_Mode_TX();
+					Delay(0x1fff);
+				}
+				USART_ITConfig(SOCKET_EXTEND_USART, USART_IT_TXE, ENABLE);										//开发送中断,并进入发送中断发送数据
+#else
+				SOCKET_Extend_USARTSend(SOCKET_EXTEND_USART, (u8 *)SocketExtendSendBuf, socketExtendsendlength);		//发送数据
+#endif
+				socketExtendsendnum += 1;
+				if (socketExtendsendnum >= 3) {
+					socketExtendsendnum = 0;
+					socketExtendreceiveflag = 0;
+					socketExtendreceivesendtime = 0;
+				}
+			}
+		}
 	}
 #else
 	socketExtendsendnum = 0;

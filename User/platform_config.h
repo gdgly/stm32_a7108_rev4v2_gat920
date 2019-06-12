@@ -33,6 +33,7 @@
 #define MAC_SN			1905218001
 #define CROSSID		19052101
 #define INTERVALTIME	60												//统计时长,默认60(单位秒),0上传实时数据
+#define SOCKETLANNUMMAX	16												//Socket Lan Num Max 16 or 32
 
 #define SOCKET_TYPE_NORMAL			0
 #define SOCKET_TYPE_XUNFEI			1

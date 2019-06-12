@@ -7,7 +7,7 @@
 
 #define		SPEEDDISTANCEINTERVAL		3								//两地磁间隔距离3M
 #define		SPEEDOVERTIME				5000								//超时阀值5000ms
-#define		SPEEDLANNUMMAX				16								//配置车道数最大16路车道
+#define		SPEEDLANNUMMAX				SOCKETLANNUMMAX					//配置车道数最大16路车道
 
 
 void  CALCULATION_GetAvgSpeed(u8 *buf);										//根据地磁发送的数据包计算平均速度
