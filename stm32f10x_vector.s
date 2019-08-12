@@ -29,7 +29,7 @@
 ;//   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ;// </h>
 
-Stack_Size       EQU     0x00000400
+Stack_Size       EQU     0x00000800
 
                  AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem        SPACE   Stack_Size
@@ -104,6 +104,23 @@ __heap_limit
                  IMPORT  EXTI15_10_IRQHandler
                  IMPORT  RTCAlarm_IRQHandler
                  IMPORT  USBWakeUp_IRQHandler
+			  IMPORT  TIM8_BRK_IRQHandler        ; TIM8 Break
+			  IMPORT  TIM8_UP_IRQHandler         ; TIM8 Update
+			  IMPORT  TIM8_TRG_COM_IRQHandler    ; TIM8 Trigger and Commutation
+			  IMPORT  TIM8_CC_IRQHandler         ; TIM8 Capture Compare
+			  IMPORT  ADC3_IRQHandler            ; ADC3
+			  IMPORT  FSMC_IRQHandler            ; FSMC
+			  IMPORT  SDIO_IRQHandler            ; SDIO
+			  IMPORT  TIM5_IRQHandler            ; TIM5
+			  IMPORT  SPI3_IRQHandler            ; SPI3
+			  IMPORT  UART4_IRQHandler           ; UART4
+			  IMPORT  UART5_IRQHandler           ; UART5
+			  IMPORT  TIM6_IRQHandler            ; TIM6
+			  IMPORT  TIM7_IRQHandler            ; TIM7
+			  IMPORT  DMA2_Channel1_IRQHandler   ; DMA2 Channel1
+			  IMPORT  DMA2_Channel2_IRQHandler   ; DMA2 Channel2
+			  IMPORT  DMA2_Channel3_IRQHandler   ; DMA2 Channel3
+			  IMPORT  DMA2_Channel4_5_IRQHandler ; DMA2 Channel4 & Channel5
 
 ;*******************************************************************************
 ; Fill-up the Vector Table entries with the exceptions ISR address
@@ -170,6 +187,23 @@ __Vectors        DCD  __initial_sp              ; Top of Stack
                  DCD  EXTI15_10_IRQHandler
                  DCD  RTCAlarm_IRQHandler
                  DCD  USBWakeUp_IRQHandler 
+                 DCD  TIM8_BRK_IRQHandler        ; TIM8 Break
+                 DCD  TIM8_UP_IRQHandler         ; TIM8 Update
+                 DCD  TIM8_TRG_COM_IRQHandler    ; TIM8 Trigger and Commutation
+                 DCD  TIM8_CC_IRQHandler         ; TIM8 Capture Compare
+                 DCD  ADC3_IRQHandler            ; ADC3
+                 DCD  FSMC_IRQHandler            ; FSMC
+                 DCD  SDIO_IRQHandler            ; SDIO
+                 DCD  TIM5_IRQHandler            ; TIM5
+                 DCD  SPI3_IRQHandler            ; SPI3
+                 DCD  UART4_IRQHandler           ; UART4
+                 DCD  UART5_IRQHandler           ; UART5
+                 DCD  TIM6_IRQHandler            ; TIM6
+                 DCD  TIM7_IRQHandler            ; TIM7
+                 DCD  DMA2_Channel1_IRQHandler   ; DMA2 Channel1
+                 DCD  DMA2_Channel2_IRQHandler   ; DMA2 Channel2
+                 DCD  DMA2_Channel3_IRQHandler   ; DMA2 Channel3
+                 DCD  DMA2_Channel4_5_IRQHandler ; DMA2 Channel4 & Channel5
 
                  AREA    |.text|, CODE, READONLY
 

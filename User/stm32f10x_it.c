@@ -52,6 +52,12 @@
 #include "socketmodulationinstantia.h"
 #include "socketmodulationinitialization.h"
 
+#include "socketxunfeiconfig.h"
+#include "socketxunfeifunc.h"
+#include "socketxunfeiinstantia.h"
+#include "socketxunfeiinitialization.h"
+#include "socketxunfeimessage.h"
+
 #include "calculationconfig.h"
 #include "iooutputconfig.h"
 
@@ -59,6 +65,9 @@
 #include "usrserial.h"
 
 #include "lestcconfig.h"
+
+#include "sdiosdcard.h"
+#include "sdiosdcarddemo.h"
 
 u8 startbytes[2],startbytes[2];
 u8 u8params[RECV_MAX][ACK_LENGTH];
@@ -68,6 +77,10 @@ u8 u8numx = 0;						//收到的数据包序号
 u8 u8numy = 0;						//收到的数据包byte序号
 u8 u8numx_now = 0;					// 当前处理到的位置
 extern u8 rssi_value[10];			//读取RSSI值,范围0-255
+
+#if SOCKET_FUNC_TYPE
+extern SOCKET_Xunfei_ClientsTypeDef SocketXunfeiClient;						//Socket Xunfei Client
+#endif
 
 void UARTx_IRQ(USART_TypeDef* USARTx);
 
@@ -223,11 +236,12 @@ void TAMPER_IRQHandler(void)
 *******************************************************************************/
 extern u16 rtc_minute_cnt, rtc_second_cnt, rtc_reset_time;
 extern volatile u8  SOCKET_RTC_CHECK;
+#if SDIO_SDCARD_TYPE
+extern bool Sdcard_DataFile_Normal_Existence;
+#endif
 void RTC_IRQHandler(void)
 {
 	static u8 led_on = 0;												//运行灯
-	static u8 Socket_RealTime = 1;										//Socket实时上传对时
-	u32 rtctime = 0;
 	
 	if (RTC_GetITStatus(RTC_IT_SEC) != RESET)
 	{
@@ -273,6 +287,13 @@ void RTC_IRQHandler(void)
 			}
 		}
 		
+		//1hours
+#if SDIO_SDCARD_TYPE
+		if ((((rtc_minute_cnt + 1) % 60) == 0) && (rtc_second_cnt == 0)) {
+			Sdcard_DataFile_Normal_Existence = true;
+		}
+#endif
+		
 		//RESETTIME秒，没收到数据，重启设备
 		if (rtc_reset_time >= RESETTIME)
 		{
@@ -290,32 +311,26 @@ void RTC_IRQHandler(void)
 			Led_ON();
 		}
 		
+#if SOCKET_FUNC_TYPE
+		if (USRInitialized == USR_INITCONFIGOVER) {
+			if (PlatformSocket == Socket_ENABLE) {											//根据SN选择是否使能Socket
+				if (INTERVALTIME != 0) {
+					SOCKET_Xunfei_Implement(&SocketXunfeiClient, INTERVALTIME);					//SocketXunfei协议到达指定时间处理
+				}
+			}
+		}
+#else
+		
 #ifdef SOCKET_ENABLE
 		if (USRInitialized == USR_INITCONFIGOVER) {
 			if (PlatformSocket == Socket_ENABLE) {											//根据SN选择是否使能Socket
 				if (INTERVALTIME != 0) {
 					socket_dev.Implement(INTERVALTIME);									//Socket协议到达指定时间处理
 				}
-				else {
-					if (PlatformSockettime == SocketTime_ENABLE) {
-						if (Socket_RealTime == 1) {
-							socket_dev.Implement(10);									//对时等待10秒
-						}
-						if (SOCKET_RTC_CHECK == 0) {										//对好时间
-							Socket_RealTime = 0;
-						}
-						else {
-							Socket_RealTime = 1;
-						}
-						rtctime = RTC_GetCounter();										//获取当前时间值
-						if ((rtctime % 86400) == 0) {										//判断是否到达凌晨0点
-							SOCKET_RTC_CHECK = PACKETTYPE_RTCCHECKINIT;						//开启RTC对时
-							GPIO_SetBits(GPIOA, GPIO_Pin_4);
-						}
-					}
-				}
 			}
 		}
+#endif
+		
 #endif
 		
 #ifdef SOCKET_EXTEND_ENABLE
@@ -413,7 +428,7 @@ u8 IsRxPacketDifferent(u8* rxData)
 *******************************************************************************/
 u8 ack_geted;
 void EXTI0_IRQHandler(void)
-{	
+{
 	if (EXTI_GetITStatus(EXTI_Line0) != RESET) {								//判断是否产生了EXTI0中断  
 		if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 0) {					//判断是否是PA0线变低
 			GPIO_SetBits(GPIOB, GPIO_Pin_5);								//点亮LED9
@@ -443,7 +458,12 @@ void EXTI0_IRQHandler(void)
 							
 							//处理AvgHeadTime获取
 							calculation_dev.GetAvgHeadTime(u8params[u8numx]);
-
+							
+							//AvgInterval
+							calculation_dev.GetAvgInterval(u8params[u8numx]);
+							
+							hand_HeartBeatOutput(u8params[u8numx]);
+							
 							//处理IO 输出
 							hand_IOOutput(u8params[u8numx]);
 							u8numx ++;
@@ -798,11 +818,24 @@ void TIM2_IRQHandler(void)
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);							//清除更新中断标志位
 		
 		if (USRInitialized == USR_INITCONFIGOVER) {							//USR配置完成
+#if SOCKET_FUNC_TYPE
+			
+#ifdef SOCKET_ENABLE
+			if (PlatformSocket == Socket_ENABLE) {							//根据SN选择是否使能Socket
+				SOCKET_XUNFEI_RX_STA |= 1<<15;							//标记接收完成
+				TIM_Cmd(TIM2, DISABLE);									//关闭TIM2
+			}
+#endif
+			
+#else
+			
 #ifdef SOCKET_ENABLE
 			if (PlatformSocket == Socket_ENABLE) {							//根据SN选择是否使能Socket
 				SOCKET_RX_STA |= 1<<15;									//标记接收完成
 				TIM_Cmd(TIM2, DISABLE);									//关闭TIM2
 			}
+#endif
+			
 #endif
 #ifdef SOCKET_EXTEND_ENABLE
 			if (PlatformSocketExtend == SocketExtend_ENABLE) {				//根据SN选择是否使能SocketExtend
@@ -827,6 +860,11 @@ void TIM2_IRQHandler(void)
 		}
 	}
 }
+
+#if SDIO_SDCARD_TYPE
+extern u8  Sdcard_Systime_Time_Meter;
+extern u32 Sdcard_Runtime_Time_MS;
+#endif
 
 //1ms定时器, 车流量数据计算定时器、IO输出补充控制定时器(开启后不可关闭)
 /*******************************************************************************
@@ -860,6 +898,14 @@ void TIM3_IRQHandler(void)
 			
 			if (CalculationDataPacket[i].Headtime_CarState == 1) {				//车头时距累加器
 				CalculationDataPacket[i].Headtime_CarUseTime += 1;
+			}
+			
+			if (CalculationDataPacket[i].Interval_CarState1 == 1) {
+				CalculationDataPacket[i].Interval_CarUseTime1 += 1;
+			}
+			
+			if (CalculationDataPacket[i].Interval_CarState2 == 1) {
+				CalculationDataPacket[i].Interval_CarUseTime2 += 1;
 			}
 		}
 		
@@ -923,6 +969,15 @@ void TIM3_IRQHandler(void)
 		else {
 			systime_runtime_ms2 = 0;
 		}
+#if SDIO_SDCARD_TYPE
+		if (Sdcard_Systime_Time_Meter != 0) {
+			Sdcard_Runtime_Time_MS++;
+		}
+		else {
+			Sdcard_Runtime_Time_MS = 0;
+		}
+#endif
+		SOCKET_PARK_EVENT = 1;
 	}
 }
 
@@ -939,7 +994,7 @@ void TIM4_IRQHandler(void)
 	u8 i;
 	/* Clear TIM4 update interrupt */
 	TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-
+	
 	if(param_recv.check_repeat_time)//如果有设置检查重复时间
 	{
 		for(i = 0; i < CHECK_PKG_MAX; i++)
@@ -1038,12 +1093,26 @@ void USART1_IRQHandler(void)
 #endif
 #endif
 	
+#if SOCKET_FUNC_TYPE
+	
+#ifdef SOCKET_ENABLE
+#ifdef SOCKET_XUNFEI_SERIALPORT_USART1										//SOCKET中断
+	if (PlatformSocket == Socket_ENABLE) {									//根据SN选择是否使能Socket
+		SOCKET_Xunfei_UARTx_IRQ(&SocketXunfeiClient, USART1);
+	}
+#endif
+#endif
+	
+#else
+	
 #ifdef SOCKET_ENABLE
 #ifdef SOCKET_SERIALPORT_USART1											//SOCKET中断
 	if (PlatformSocket == Socket_ENABLE) {									//根据SN选择是否使能Socket
 		socket_dev.UARTx_IRQ(USART1);
 	}
 #endif
+#endif
+	
 #endif
 	
 #ifdef SOCKET_EXTEND_ENABLE
@@ -1089,13 +1158,27 @@ void USART2_IRQHandler(void)
 	}
 #endif
 #endif
-
+	
+#if SOCKET_FUNC_TYPE
+	
+#ifdef SOCKET_ENABLE
+#ifdef SOCKET_XUNFEI_SERIALPORT_USART2										//SOCKET中断
+	if (PlatformSocket == Socket_ENABLE) {									//根据SN选择是否使能Socket
+		SOCKET_Xunfei_UARTx_IRQ(&SocketXunfeiClient, USART2);
+	}
+#endif
+#endif
+	
+#else
+	
 #ifdef SOCKET_ENABLE
 #ifdef SOCKET_SERIALPORT_USART2											//SOCKET中断
 	if (PlatformSocket == Socket_ENABLE) {									//根据SN选择是否使能Socket
 		socket_dev.UARTx_IRQ(USART2);
 	}
 #endif
+#endif
+	
 #endif
 	
 #ifdef SOCKET_EXTEND_ENABLE
@@ -1141,12 +1224,26 @@ void USART3_IRQHandler(void)
 #endif
 
 	if (USRInitialized == USR_INITCONFIGOVER) {								//USR配置完成
+#if SOCKET_FUNC_TYPE
+	
+#ifdef SOCKET_ENABLE
+#ifdef SOCKET_XUNFEI_SERIALPORT_USART3										//SOCKET中断
+		if (PlatformSocket == Socket_ENABLE) {								//根据SN选择是否使能Socket
+			SOCKET_Xunfei_UARTx_IRQ(&SocketXunfeiClient, USART3);
+		}
+#endif
+#endif
+	
+#else
+	
 #ifdef SOCKET_ENABLE
 #ifdef SOCKET_SERIALPORT_USART3											//SOCKET中断
 		if (PlatformSocket == Socket_ENABLE) {								//根据SN选择是否使能Socket
 			socket_dev.UARTx_IRQ(USART3);
 		}
 #endif
+#endif
+	
 #endif
 
 #ifdef SOCKET_EXTEND_ENABLE
@@ -1238,6 +1335,214 @@ void RTCAlarm_IRQHandler(void)
 *******************************************************************************/
 void USBWakeUp_IRQHandler(void)
 {
+	
+}
+
+/*******************************************************************************
+* Function Name  : TIM8_BRK_IRQHandler
+* Description    : This function handles TIM8_BRK_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM8_BRK_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : TIM8_UP_IRQHandler
+* Description    : This function handles TIM8_UP_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM8_UP_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : TIM8_TRG_COM_IRQHandler
+* Description    : This function handles TIM8_TRG_COM_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM8_TRG_COM_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : TIM8_CC_IRQHandler
+* Description    : This function handles TIM8_CC_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM8_CC_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : ADC3_IRQHandler
+* Description    : This function handles ADC3_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void ADC3_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : FSMC_IRQHandler
+* Description    : This function handles FSMC_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void FSMC_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : SDIO_IRQHandler
+* Description    : This function handles SDIO_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void SDIO_IRQHandler(void)
+{
+#if SDIO_SDCARD_TYPE
+	/* Process All SDIO Interrupt Sources */
+	SD_ProcessIRQSrc();
+#endif
+}
+
+/*******************************************************************************
+* Function Name  : TIM5_IRQHandler
+* Description    : This function handles TIM5_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM5_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : SPI3_IRQHandler
+* Description    : This function handles SPI3_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void SPI3_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : UART4_IRQHandler
+* Description    : This function handles UART4_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void UART4_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : UART5_IRQHandler
+* Description    : This function handles UART5_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void UART5_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : TIM6_IRQHandler
+* Description    : This function handles TIM6_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM6_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : TIM7_IRQHandler
+* Description    : This function handles TIM7_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM7_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : DMA2_Channel1_IRQHandler
+* Description    : This function handles DMA2_Channel1_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void DMA2_Channel1_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : DMA2_Channel2_IRQHandler
+* Description    : This function handles DMA2_Channel2_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void DMA2_Channel2_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : DMA2_Channel3_IRQHandler
+* Description    : This function handles DMA2_Channel3_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void DMA2_Channel3_IRQHandler(void)
+{
+	
+}
+
+/*******************************************************************************
+* Function Name  : DMA2_Channel4_5_IRQHandler
+* Description    : This function handles DMA2_Channel4_5_IRQHandler interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void DMA2_Channel4_5_IRQHandler(void)
+{
+	
 }
 
 /******************* (C) COPYRIGHT 2007 STMicroelectronics *****END OF FILE****/

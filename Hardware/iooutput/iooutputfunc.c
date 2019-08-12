@@ -1414,6 +1414,10 @@ void IOOutput_Mode6_Check(u16 dici_index, u16 dici_carnum, u8 dici_in)
 				}
 			}
 			
+			IOOutputStruct[dici_index].SupplyingFlag = 1;
+			IOOutputStruct[dici_index].SupplyUseTime = 0;
+			IOOutputStruct[dici_index].SupplyingCarNum = 0;
+			
 			IOOutputStruct[dici_index].SupplyedIOLevel = 0;								//补充车辆数结束后输出低电平
 		}
 	}

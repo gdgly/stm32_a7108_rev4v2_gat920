@@ -30,14 +30,19 @@
 
 //自动写SN, CROSSID, jFlash烧写程序版本需要去掉
 //#define WRITE_SN_CROSSID
-#define MAC_SN			1905218001
-#define CROSSID		19052101
+#define MAC_SN			1908128001
+#define CROSSID		19081201
 #define INTERVALTIME	60												//统计时长,默认60(单位秒),0上传实时数据
 #define SOCKETLANNUMMAX	16												//Socket Lan Num Max 16 or 32
 
 #define SOCKET_TYPE_NORMAL			0
 #define SOCKET_TYPE_XUNFEI			1
 #define SOCKET_FUNC_TYPE				SOCKET_TYPE_NORMAL						//Select socket function normal or xunfei
+
+#define SDIO_SDCARD_NONE				0
+#define SDIO_SDCARD_USER				1
+#define SDIO_SDCARD_TYPE				SDIO_SDCARD_NONE						//Sdio SD Card
+
 /*
 MAC_SN : 倒数第三位
 0 :  Modbus --> USART2, Gat920 --> USART1, Socket --> DISABLE, SocketTime --> DISABLE, Gat920 --> DISABLE, LESTC --> DISABLE, GPRS/RJ45 --> DISABLE
@@ -58,8 +63,12 @@ MAC_SN : 倒数第三位
 #define	LOCALPORT			"4008"										//本地端口值0~65535
 #define	DHCP				0											//0:静态IP 1:DHCP
 
-#define	MVB_SOFTWARE_VERSION		0x0112
+#define	MVB_SOFTWARE_VERSION		0x0113
 #define	MVB_HARDWARE_VERSION		0x0402
+
+#define	SOCKET_CARLENGTH_V1			0
+#define	SOCKET_CARLENGTH_V2			1
+#define	SOCKET_CARLENGTH_TYPE		SOCKET_CARLENGTH_V2
 
 /* ModBus使能, 如注释该宏定义则不使用ModBus协议 */
 #define	MODBUS_ENABLE

@@ -30,6 +30,18 @@ typedef struct
 	u16		Headtime_CarNumState;										//经过车辆数保存值
 	u32		Headtime_CarSumTime;										//一段时间内该车道车辆总间距时间
 	u16		Headtime_CarSumNum;											//一段时间内该车道车辆总数
+	
+	u8		Interval_CarState1;
+	u32		Interval_CarUseTime1;
+	u16		Interval_CarNumState1;
+	u32		Interval_CarSumTime1;
+	u16		Interval_CarSumNum1;
+	
+	u8		Interval_CarState2;
+	u32		Interval_CarUseTime2;
+	u16		Interval_CarNumState2;
+	u32		Interval_CarSumTime2;
+	u16		Interval_CarSumNum2;
 }Calculation_Data_Packet;												//计算数据包
 
 /* calculation外部接口数据读取控制管理器 */
@@ -50,6 +62,9 @@ struct _m_calculation_dev
 	void		(*GetAvgHeadTime)(u8 *buf);									//根据地磁发送的数据包计算平均车头时距
 	u16		(*ReadAvgHeadTime)(u16 outputid);								//获取该车道平均车头时距
 	u32		(*ReadAvgHeadTimeExtend)(u16 outputid);							//获取该车道平均车头时距(扩增支持数据为4字节int)
+	
+	void		(*GetAvgInterval)(u8 *buf);
+	u32		(*ReadAvgInterval)(u16 outputid, u32* sumTime1, u32* sumTime2);
 };
 
 

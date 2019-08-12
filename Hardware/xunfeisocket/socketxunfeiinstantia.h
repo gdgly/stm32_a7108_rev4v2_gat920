@@ -9,10 +9,6 @@
 
 void SOCKET_Xunfei_GetFillData(SOCKET_Xunfei_ClientsTypeDef* pClient);
 
-
-
-
-
 int SOCKET_Xunfei_GetDirverWayCode(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outputid, u16 inlen);
 
 char* SOCKET_Xunfei_GetDateTime(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outputid, u16 inlen);
@@ -28,16 +24,5 @@ u16 SOCKET_Xunfei_GetAvgHeadTime(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outp
 float SOCKET_Xunfei_GetAvgSpeed(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outputid, u16 inlen);
 
 float SOCKET_Xunfei_GetAvgLength(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outputid, u16 inlen);
-
-
-
-
-
-
-
-
-
-
-
 
 #endif

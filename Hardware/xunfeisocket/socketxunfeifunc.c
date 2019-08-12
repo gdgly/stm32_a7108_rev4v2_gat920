@@ -31,11 +31,6 @@ unsigned int SOCKET_Xunfei_GetNextMsgId(SOCKET_Xunfei_ClientsTypeDef* pClient)
 	return pClient->MsgId;
 }
 
-
-
-
-
-
 /**********************************************************************************************************
  @Function			SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_Serialize_LoginRequest(SOCKET_Xunfei_ClientsTypeDef* pClient, const char* account, const char* passwd)
  @Description			SOCKET_Xunfei_Serialize_LoginRequest	: 序列化登入请求
@@ -144,18 +139,37 @@ SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_Serialize_LenDataRequest(SOCKET_Xunfei
 	sprintf(databuffer + datalen, ",%d", pClient->Parameter[inlen].Volume);
 	datalen = strlen(databuffer);
 	
+	/* 平均速度 */
+	sprintf(databuffer + datalen, ",%d", (int)pClient->Parameter[inlen].AvgSpeed);
+	datalen = strlen(databuffer);
 	
+	/* 平均车长 */
+	sprintf(databuffer + datalen, ",%d", (int)pClient->Parameter[inlen].AvgLength);
+	datalen = strlen(databuffer);
 	
+	/* 时间占有率 */
+	sprintf(databuffer + datalen, ",%.3f", (float)(pClient->Parameter[inlen].AvgOccupancy * pClient->Parameter[inlen].Volume / (1000.0 * pClient->Parameter[inlen].Interval)));
+	datalen = strlen(databuffer);
 	
+	/* 空间占有率 */
+	sprintf(databuffer + datalen, ",");
+	datalen = strlen(databuffer);
 	
+	/* 车头间距 */
+	sprintf(databuffer + datalen, ",");
+	datalen = strlen(databuffer);
 	
+	/* 车头时距 */
+	sprintf(databuffer + datalen, ",%.1f", (float)(pClient->Parameter[inlen].AvgHeadTime / 1000.0));
+	datalen = strlen(databuffer);
 	
+	/* 车辆密度 */
+	sprintf(databuffer + datalen, ",");
+	datalen = strlen(databuffer);
 	
-	
-	
-	
-	
-	
+	/* 其他参数 */
+	sprintf(databuffer + datalen, ",,,,,,,");
+	datalen = strlen(databuffer);
 	
 	data->dataHead = htonl(strlen(databuffer));
 	
@@ -166,7 +180,7 @@ SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_Serialize_LenDataRequest(SOCKET_Xunfei
 
 /**********************************************************************************************************
  @Function			SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_Deserialize_LenDataRequest(SOCKET_Xunfei_ClientsTypeDef* pClient, char* buf, int len)
- @Description			SOCKET_Xunfei_Deserialize_LenDataRequest: 反序列化登入请求应答
+ @Description			SOCKET_Xunfei_Deserialize_LenDataRequest: 反序列化车道交通流量数据
  @Input				pClient							: Socket Xunfei客户端实例
  @Return				SOCKET_Xunfei_StatusTypeDef			: 状态
 **********************************************************************************************************/
@@ -205,51 +219,6 @@ exit:
 	return status;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**********************************************************************************************************
  @Function			SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_GetOutputID(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 *outputid)
  @Description			SOCKET_Xunfei_GetOutputID			: 读取OutputID输出端口
@@ -267,22 +236,5 @@ SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_GetOutputID(SOCKET_Xunfei_ClientsTypeD
 	
 	return status;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /********************************************** END OF FLEE **********************************************/

@@ -40,7 +40,7 @@ struct _m_socket_dev socket_dev =
 	SOCKET_GetAvgSpeed,													//获取AvgSpeed平均速度
 	SOCKET_GetSaturation,												//获取Saturation饱和度
 	SOCKET_GetDensity,													//获取Density密度
-	SOCKET_GetPcu,														//获取Pcu当量小汽车
+	SOCKET_GetVoltage,													//获取Voltage
 	SOCKET_GetAvgQueueLength,											//获取AvgQueueLength排队长度
 	
 	SOCKET_FillData,													//将数据填入各个数据包

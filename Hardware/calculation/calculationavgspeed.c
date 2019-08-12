@@ -111,6 +111,8 @@ float CALCULATION_ReadAvgSpeed(u16 outputid)
 		avgspeedval *= 3.6;
 	}
 	
+	if (avgspeedval >= SPEEDMIN) avgspeedval = SPEEDMIN;
+	
 	return avgspeedval;
 }
 

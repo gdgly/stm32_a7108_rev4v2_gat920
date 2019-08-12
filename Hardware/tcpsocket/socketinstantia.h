@@ -27,6 +27,7 @@ float SOCKET_GetAvgLength(u16 outputid);									//例化获取AvgLength平均车长
 float SOCKET_GetAvgSpeed(u16 outputid);										//例化获取AvgSpeed平均速度
 u8    SOCKET_GetSaturation(u16 outputid);									//例化获取Saturation饱和度
 u16   SOCKET_GetDensity(u16 outputid);										//例化获取Density密度
+u16   SOCKET_GetVoltage(u16 outputid);										//例化获取Voltage
 u16   SOCKET_GetPcu(u16 outputid);											//例化获取Pcu当量小汽车
 float SOCKET_GetAvgQueueLength(u16 outputid);								//例化获取AvgQueueLength排队长度
 

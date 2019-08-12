@@ -185,7 +185,7 @@ u16 SOCKET_ObtainPacketData(u8 *addr)
 				datalength += 2;																	//地址偏移2byte
 			}
 			
-			if ((SOCKET_Convert2Byte((u8 *)&addr[datalength], SocketDataPacket[i].Pcu)) == SOCKET_FALSE) {					//填入当量小汽车
+			if ((SOCKET_Convert2Byte((u8 *)&addr[datalength], SocketDataPacket[i].Voltage)) == SOCKET_FALSE) {				//填入Voltage
 				return SOCKET_FALSE;
 			}
 			else {

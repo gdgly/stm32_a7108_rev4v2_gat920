@@ -12,18 +12,6 @@ SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_Deserialize_LoginRequest(SOCKET_Xunfei
 SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_Serialize_LenDataRequest(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outputid, u16 inlen);
 SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_Deserialize_LenDataRequest(SOCKET_Xunfei_ClientsTypeDef* pClient, char* buf, int len);
 
-
-
-
-
-
-
-
-
 SOCKET_Xunfei_StatusTypeDef SOCKET_Xunfei_GetOutputID(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 *outputid);
-
-
-
-
 
 #endif

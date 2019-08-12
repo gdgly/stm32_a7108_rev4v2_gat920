@@ -79,7 +79,24 @@ void USART3_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 void RTCAlarm_IRQHandler(void);
 void USBWakeUp_IRQHandler(void);
-					 
+void TIM8_BRK_IRQHandler(void);
+void TIM8_UP_IRQHandler(void);
+void TIM8_TRG_COM_IRQHandler(void);
+void TIM8_CC_IRQHandler(void);
+void ADC3_IRQHandler(void);
+void FSMC_IRQHandler(void);
+void SDIO_IRQHandler(void);
+void TIM5_IRQHandler(void);
+void SPI3_IRQHandler(void);
+void UART4_IRQHandler(void);
+void UART5_IRQHandler(void);
+void TIM6_IRQHandler(void);
+void TIM7_IRQHandler(void);
+void DMA2_Channel1_IRQHandler(void);
+void DMA2_Channel2_IRQHandler(void);
+void DMA2_Channel3_IRQHandler(void);
+void DMA2_Channel4_5_IRQHandler(void);
+
 #endif /* __STM32F10x_IT_H */
 
 /******************* (C) COPYRIGHT 2007 STMicroelectronics *****END OF FILE****/

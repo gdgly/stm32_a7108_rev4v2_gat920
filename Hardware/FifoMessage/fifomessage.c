@@ -344,4 +344,26 @@ unsigned char netMessageFifoRear(MessageFifoTypeDef *pMessageFifo)
 	return pMessageFifo->Rear;
 }
 
+/**********************************************************************************************************
+ @Function			int netMessageFifoStatus(MessageFifoTypeDef *pMessageFifo)
+ @Description			netMessageFifoStatus			: 获取消息队列已用大小
+ @Input				pMessageFifo					: FiFo队列地址
+ @Return				队列已用大小
+**********************************************************************************************************/
+int netMessageFifoStatus(MessageFifoTypeDef *pMessageFifo)
+{
+	return Fifo_status(&pMessageFifo->dataFifo);
+}
+
+/**********************************************************************************************************
+ @Function			int netMessageFifoFree(MessageFifoTypeDef *pMessageFifo)
+ @Description			netMessageFifoFree				: 获取消息队列剩余大小
+ @Input				pMessageFifo					: FiFo队列地址
+ @Return				队列剩余大小
+**********************************************************************************************************/
+int netMessageFifoFree(MessageFifoTypeDef *pMessageFifo)
+{
+	return Fifo_free(&pMessageFifo->dataFifo);
+}
+
 /********************************************** END OF FLEE **********************************************/

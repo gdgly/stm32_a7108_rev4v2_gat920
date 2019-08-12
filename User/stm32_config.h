@@ -13,6 +13,7 @@ extern void EXTI_Configuration(void);
 extern void hand_RTdata(void);
 extern void hand_config(u8* buf);
 extern void hand_IOOutput(u8* buf);
+extern void hand_HeartBeatOutput(u8* buf);
 extern void param_save_to_flash(void);
 
 void MAX823_IWDGInitEnable(void);											//初始化MAX823硬件看门狗

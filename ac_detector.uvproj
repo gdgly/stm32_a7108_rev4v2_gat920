@@ -377,7 +377,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\Hardware\a7108;.\Hardware\driver;.\Hardware\modbus;.\Hardware\nrf24l01;.\Libraries\library2008\inc;.\User;.\Hardware\rtc;.\Hardware\usart;.\Hardware\gat920;.\Hardware\tcpsocket;.\Hardware\extendsocket;.\Hardware\modulationsocket;.\Hardware\xunfeisocket;.\Hardware\calculation;.\Hardware\iooutput;.\Hardware\usr;.\Hardware\lestc;.\Hardware\FifoMessage</IncludePath>
+              <IncludePath>.\Hardware\a7108;.\Hardware\driver;.\Hardware\modbus;.\Hardware\nrf24l01;.\Libraries\library2008\inc;.\User;.\Hardware\rtc;.\Hardware\usart;.\Hardware\gat920;.\Hardware\tcpsocket;.\Hardware\extendsocket;.\Hardware\modulationsocket;.\Hardware\xunfeisocket;.\Hardware\calculation;.\Hardware\iooutput;.\Hardware\usr;.\Hardware\lestc;.\Hardware\FifoMessage;.\Hardware\sdio;.\Libraries\fatfs</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -781,6 +781,11 @@
               <FileType>1</FileType>
               <FilePath>.\Hardware\tcpsocket\socketpark.c</FilePath>
             </File>
+            <File>
+              <FileName>socketmessage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\tcpsocket\socketmessage.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -895,6 +900,76 @@
               <FileName>calculationavgheadtime.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\calculation\calculationavgheadtime.c</FilePath>
+            </File>
+            <File>
+              <FileName>calculationavginterval.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\calculation\calculationavginterval.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>sdiosdcard</GroupName>
+          <Files>
+            <File>
+              <FileName>sdiosdcard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\sdio\sdiosdcard.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdiosdcardapp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\sdio\sdiosdcardapp.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdiosdcarddemo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\sdio\sdiosdcarddemo.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdiosdcardfatfsdemo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\sdio\sdiosdcardfatfsdemo.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdiosdcardfatfsinterface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\sdio\sdiosdcardfatfsinterface.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdiosdcardmessage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\sdio\sdiosdcardmessage.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdiosdcarduserapp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\sdio\sdiosdcarduserapp.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>fatfs</GroupName>
+          <Files>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Libraries\fatfs\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Libraries\fatfs\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffsystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Libraries\fatfs\ffsystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffunicode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Libraries\fatfs\ffunicode.c</FilePath>
             </File>
           </Files>
         </Group>

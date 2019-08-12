@@ -30,6 +30,7 @@
 #include "rtc.h"
 #include "bsp_usart.h"
 #include "socketconfig.h"
+#include "socketinitialization.h"
 #include "socketextendconfig.h"
 #include "socketmodulationconfig.h"
 #include "socketpark.h"
@@ -48,6 +49,11 @@
 #include "socketxunfeiinstantia.h"
 #include "socketxunfeiinitialization.h"
 #include "socketxunfeimessage.h"
+#include "sdiosdcard.h"
+#include "sdiosdcarddemo.h"
+#include "sdiosdcardfatfsdemo.h"
+#include "sdiosdcarduserapp.h"
+#include "sdiosdcardapp.h"
 
 extern u8 ack_geted;
 extern int SysTick_count;
@@ -61,6 +67,8 @@ mvb_param_net_config		param_net_cfg;									//网络配置参数
 mvb_pkg_wvd_cfg			pkg_wvd_cfg;									//向上位机发送的配置数据包
 u8 						rssi_value[RECV_MAX];							//存储的rssi值
 USHORT 					output_ID[OUTPUT_MAX];							//输出端口的参数
+u8						output_Volt[OUTPUT_MAX];							//输出端口的地磁电压
+u8						output_Temperature[OUTPUT_MAX];					//输出端口的地磁温度
 u8 OUTPUT_NUM;          													//可以使用的输出端口
 u32 Crossid;															//路口代码
 
@@ -88,6 +96,7 @@ u16 OUTPUT_PIN[16] =
 USHORT hand_simple_data(void);
 USHORT hand_complete_data(void);
 void hand_IOOutput(u8* buf);
+void hand_HeartBeatOutput(u8* buf);
 
 void init_param_recv_default(u32 sn, u32 crossid);
 void hand_config(u8* buf);
@@ -306,7 +315,7 @@ int main(void)
 #ifdef HARDWAREIWDG
 	MAX823_IWDGReloadCounter();											//硬件看门狗喂狗
 #endif
-
+	
 #if LED_GPIO
 	for (i = 0; i < OUTPUT_NUM; i++) {										//测试GPIO,全部点亮一遍
 		GPIO_SetBits(OUTPUT_TYPE[i], OUTPUT_PIN[i]); 
@@ -320,7 +329,11 @@ int main(void)
 #endif
 	}
 #endif
-
+	
+#if SDIO_SDCARD_TYPE
+	SDCard_APP_Initialized();
+#endif
+	
 	if ((recv_sn == 0xFFFFFFFF) && (Crossid == 0xFFFFFFFF)) {
 		init_param_recv_default(0x12345678, 12345678);
 		param_save_to_flash();
@@ -460,11 +473,19 @@ int main(void)
 		}
 	}
 	
+	if (PlatformSocket == Socket_ENABLE) {
+		SOCKET_Park_ImplementEvent();
+	}
+	
 #ifdef SOFTWAREIWDG
 		IWDG_ReloadCounter();											//软件看门狗喂狗
 #endif
 #ifdef HARDWAREIWDG
 		MAX823_IWDGReloadCounter();										//硬件看门狗喂狗
+#endif
+	
+#if SDIO_SDCARD_TYPE
+		SDCard_APP_RunEvent();
 #endif
 	}
 }
@@ -581,6 +602,23 @@ USHORT hand_simple_data(void)
 		u8numx_now %= RECV_MAX;
 	}
 	return usLen;
+}
+
+//保存心跳数据地磁信息
+void hand_HeartBeatOutput(u8* buf)
+{
+	int i;
+	RF_DataHeader_TypeDef *phead = (RF_DataHeader_TypeDef *)buf;
+	
+	//车辆心跳或统计数据包
+	if ((phead->type == DATATYPE_HEARTBEAT_WITHOUT_MAGENV) || (phead->type == DATATYPE_HEARTBEAT_WITH_MAGENV)) {
+		for (i = 0; i < OUTPUT_MAX; i++) {
+			if ((output_ID[i] == (phead->addr_dev)) || (output_ID[i] == 0xFFFF)) {
+				output_Volt[i] = buf[5];
+				output_Temperature[i] = buf[6];
+			}
+		}
+	}
 }
 
 //处理IO数据输出
@@ -713,7 +751,7 @@ void hand_IOOutput(u8* buf)
 				if (PlatformSocket == Socket_ENABLE) {											//根据SN选择是否使能Socket
 					if (INTERVALTIME == 0) {
 						if (PlatformSockettime == SocketTime_ENABLE) {							//判断是否开启对时项
-							if (SOCKET_RTC_CHECK == 0) {										//对好时间
+							if ((SOCKET_RTC_CHECK == 0) || (PACKETTYPE_RTCCHECKINIT == SOCKET_RTC_CHECK)) {					//对好时间
 								SOCKET_ParkImplement(i, carnumstate, 1);
 							}
 						}
@@ -846,7 +884,7 @@ void hand_IOOutput(u8* buf)
 				if (PlatformSocket == Socket_ENABLE) {											//根据SN选择是否使能Socket
 					if (INTERVALTIME == 0) {
 						if (PlatformSockettime == SocketTime_ENABLE) {							//判断是否开启对时项
-							if (SOCKET_RTC_CHECK == 0) {										//对好时间
+							if ((SOCKET_RTC_CHECK == 0) || (PACKETTYPE_RTCCHECKINIT == SOCKET_RTC_CHECK)) {					//对好时间
 								SOCKET_ParkImplement(i, carnumstate, 0);
 							}
 						}

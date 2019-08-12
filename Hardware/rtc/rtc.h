@@ -20,4 +20,6 @@ int RTC_Time_GetTimeHour(void);
 int RTC_Time_GetTimeMin(void);
 int RTC_Time_GetTimeSec(void);
 
+unsigned int RTC_Time_GetTime(u8* year, u8* mon, u8* day, u8* hous, u8* min, u8* sec);
+
 #endif /* RTC_H */

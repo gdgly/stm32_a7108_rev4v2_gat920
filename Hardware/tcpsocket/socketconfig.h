@@ -8,7 +8,13 @@
 #define	SOCKET_CACHE_SIZE				2048						//2K协议缓存, 32路车道需1903Byte
 #define	SOCKET_RECVIVE_SIZE				20						//接收缓存,数据包头13Byte
 
-#define	SOCKET_AGAINSENDTIME			5						//3秒后没收到回包重发数据
+#if (INTERVALTIME == 0)
+#define	SOCKET_AGAINSENDTIME			5*900					//5秒后没收到回包重发数据
+#define	SOCKET_PARK_AGAINSENDTIME		50						//50ms后没收到回包重发数据
+#else
+#define	SOCKET_AGAINSENDTIME			5						//5秒后没收到回包重发数据
+#define	SOCKET_PARK_AGAINSENDTIME		50						//50ms后没收到回包重发数据
+#endif
 
 #define	SOCKET_TRUE					0
 #define	SOCKET_FALSE					1
@@ -62,7 +68,7 @@ typedef struct
 	float	AvgSpeed;											//平均速度
 	u8		Saturation;										//饱和度
 	u16		Density;											//密度
-	u16		Pcu;												//当量小汽车
+	u16		Voltage;											//Voltage
 	float	AvgQueueLength;									//排队长度
 }Socket_Packet_Data;											//流量数据包
 
@@ -90,7 +96,7 @@ struct _m_socket_dev
 	float	(*GetAvgSpeed)(u16);								//获取AvgSpeed平均速度
 	u8		(*GetSaturation)(u16);								//获取Saturation饱和度
 	u16		(*GetDensity)(u16);									//获取Density密度
-	u16		(*GetPcu)(u16);									//获取Pcu当量小汽车
+	u16		(*GetVoltage)(u16);									//获取Voltage
 	float	(*GetAvgQueueLength)(u16);							//获取AvgQueueLength排队长度
 	
 	void		(*FillData)(void);									//将数据填入各个数据包

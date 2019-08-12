@@ -7,8 +7,8 @@
 #include <stdio.h>
 
 /* 选择串口作为 printf 发送端口 */
-//#define PRINTF_USART	USART1
-#define PRINTF_USART	USART2
+#define PRINTF_USART	USART1
+//#define PRINTF_USART	USART2
 //#define PRINTF_USART	USART3
 
 #define RS485_Mode_RX()		GPIO_ResetBits( GPIOA, GPIO_Pin_1 )

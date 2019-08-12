@@ -246,4 +246,29 @@ int RTC_Time_GetTimeSec(void)
 	return rtc_tm_s.tm_sec;
 }
 
+/***************************************************************
+ @Function			unsigned int RTC_Time_GetTime(u8* year, u8* mon, u8* day, u8* hous, u8* min, u8* sec)
+ @Description			时间获取
+ @Input				时间值
+ @Return				时间戳
+***************************************************************/
+unsigned int RTC_Time_GetTime(u8* year, u8* mon, u8* day, u8* hous, u8* min, u8* sec)
+{
+	struct rtc_time rtc_tm_s;
+	uint32_t BJ_TimeVar;
+	
+	BJ_TimeVar = RTC_GetCounter();
+	
+	to_tm(BJ_TimeVar, &rtc_tm_s);
+	
+	*year	= rtc_tm_s.tm_year - 2000;
+	*mon		= rtc_tm_s.tm_mon;
+	*day		= rtc_tm_s.tm_mday;
+	*hous	= rtc_tm_s.tm_hour;
+	*min		= rtc_tm_s.tm_min;
+	*sec		= rtc_tm_s.tm_sec;
+	
+	return BJ_TimeVar;
+}
+
 /******************************** END OF FLEE **********************************/

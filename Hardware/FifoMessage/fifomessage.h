@@ -37,5 +37,7 @@ bool netMessageFifoEnqueue(MessageFifoTypeDef *pMessageFifo, unsigned char* buf,
 bool netMessageFifoDequeue(MessageFifoTypeDef *pMessageFifo, unsigned char* buf, unsigned short* len);			//数据读出消息队列
 unsigned char netMessageFifoFront(MessageFifoTypeDef *pMessageFifo);										//获取消息队列队头值
 unsigned char netMessageFifoRear(MessageFifoTypeDef *pMessageFifo);										//获取消息队列队尾值
+int netMessageFifoStatus(MessageFifoTypeDef *pMessageFifo);												//获取消息队列已用大小
+int netMessageFifoFree(MessageFifoTypeDef *pMessageFifo);												//获取消息队列剩余大小
 
 #endif /* __FIFO_MESSAGE_H */

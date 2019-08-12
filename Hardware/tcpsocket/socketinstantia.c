@@ -40,9 +40,11 @@
 #include "socketinitialization.h"
 #include "calculationconfig.h"
 #include "calculationavgspeed.h"
-
+#include "bsp_usart.h"
 
 extern u32 Crossid;
+extern u8 output_Volt[OUTPUT_MAX];
+extern u8 output_Temperature[OUTPUT_MAX];
 
 /**********************************************************************************************************
  @Function			void SOCKET_FillData(void)
@@ -81,7 +83,7 @@ void SOCKET_FillData(void)
 						SocketDataPacket[indexA].AvgLength = SocketDataPacket[indexB - 1].AvgLength;						//写入AvgLength
 						SocketDataPacket[indexA].Saturation = SocketDataPacket[indexB - 1].Saturation;						//写入Saturation
 						SocketDataPacket[indexA].Density = SocketDataPacket[indexB - 1].Density;							//写入Density
-						SocketDataPacket[indexA].Pcu = SocketDataPacket[indexB - 1].Pcu;									//写入Pcu
+						SocketDataPacket[indexA].Voltage = SocketDataPacket[indexB - 1].Voltage;							//写入Voltage
 						SocketDataPacket[indexA].AvgQueueLength = SocketDataPacket[indexB - 1].AvgQueueLength;				//写入AvgQueueLength
 						break;
 					}
@@ -103,7 +105,7 @@ void SOCKET_FillData(void)
 					SocketDataPacket[indexA].AvgLength = socket_dev.GetAvgLength(SocketDataPacket[indexA].OutputID);			//写入AvgLength
 					SocketDataPacket[indexA].Saturation = socket_dev.GetSaturation(SocketDataPacket[indexA].OutputID);			//写入Saturation
 					SocketDataPacket[indexA].Density = socket_dev.GetDensity(SocketDataPacket[indexA].OutputID);				//写入Density
-					SocketDataPacket[indexA].Pcu = socket_dev.GetPcu(SocketDataPacket[indexA].OutputID);						//写入Pcu
+					SocketDataPacket[indexA].Voltage = socket_dev.GetVoltage(SocketDataPacket[indexA].OutputID);				//写入Voltage
 					SocketDataPacket[indexA].AvgQueueLength = socket_dev.GetAvgQueueLength(SocketDataPacket[indexA].OutputID);	//写入AvgQueueLength
 				}
 			}
@@ -125,7 +127,7 @@ void SOCKET_FillData(void)
 					SocketDataPacket[indexA].AvgLength = SocketDataPacket[indexA - SPEEDLANNUMMAX].AvgLength;					//写入AvgLength
 					SocketDataPacket[indexA].Saturation = SocketDataPacket[indexA - SPEEDLANNUMMAX].Saturation;				//写入Saturation
 					SocketDataPacket[indexA].Density = SocketDataPacket[indexA - SPEEDLANNUMMAX].Density;					//写入Density
-					SocketDataPacket[indexA].Pcu = SocketDataPacket[indexA - SPEEDLANNUMMAX].Pcu;							//写入Pcu
+					SocketDataPacket[indexA].Voltage = SocketDataPacket[indexA - SPEEDLANNUMMAX].Voltage;					//写入Voltage
 					SocketDataPacket[indexA].AvgQueueLength = SocketDataPacket[indexA - SPEEDLANNUMMAX].AvgQueueLength;			//写入AvgQueueLength
 				}
 				else {																			//辅地磁对应主地磁无配置
@@ -147,7 +149,7 @@ void SOCKET_FillData(void)
 							SocketDataPacket[indexA].AvgLength = SocketDataPacket[indexB - 1].AvgLength;						//写入AvgLength
 							SocketDataPacket[indexA].Saturation = SocketDataPacket[indexB - 1].Saturation;						//写入Saturation
 							SocketDataPacket[indexA].Density = SocketDataPacket[indexB - 1].Density;							//写入Density
-							SocketDataPacket[indexA].Pcu = SocketDataPacket[indexB - 1].Pcu;									//写入Pcu
+							SocketDataPacket[indexA].Voltage = SocketDataPacket[indexB - 1].Voltage;							//写入Voltage
 							SocketDataPacket[indexA].AvgQueueLength = SocketDataPacket[indexB - 1].AvgQueueLength;				//写入AvgQueueLength
 							break;
 						}
@@ -169,7 +171,7 @@ void SOCKET_FillData(void)
 						SocketDataPacket[indexA].AvgLength = socket_dev.GetAvgLength(SocketDataPacket[indexA].OutputID);			//写入AvgLength
 						SocketDataPacket[indexA].Saturation = socket_dev.GetSaturation(SocketDataPacket[indexA].OutputID);			//写入Saturation
 						SocketDataPacket[indexA].Density = socket_dev.GetDensity(SocketDataPacket[indexA].OutputID);				//写入Density
-						SocketDataPacket[indexA].Pcu = socket_dev.GetPcu(SocketDataPacket[indexA].OutputID);						//写入Pcu
+						SocketDataPacket[indexA].Voltage = socket_dev.GetVoltage(SocketDataPacket[indexA].OutputID);				//写入Voltage
 						SocketDataPacket[indexA].AvgQueueLength = socket_dev.GetAvgQueueLength(SocketDataPacket[indexA].OutputID);	//写入AvgQueueLength
 					}
 				}
@@ -423,6 +425,15 @@ float SOCKET_GetAvgLength(u16 outputid)
 	float avglengthval = 0;
 	float avgspeedval = 0;
 	u16 avgoccupancyval = 0;
+#if SOCKET_CARLENGTH_TYPE == SOCKET_CARLENGTH_V2
+	u32 intervaltime1 = 0;
+	u32 intervaltime2 = 0;
+	float avglengthval1 = 0;
+	float avglengthval2 = 0;
+	float avgspeedval1 = 0;
+	float avgspeedval2 = 0;
+	u8 nCount = 0;
+#endif
 	
 	for (i = 0; i < OUTPUT_MAX; i++) {										//获取已配置ID号最大值
 		if (SocketDataPacket[i].OutputID != 0) {
@@ -432,6 +443,7 @@ float SOCKET_GetAvgLength(u16 outputid)
 	
 	if (outputnum >= SPEEDLANNUMMAX) 										//判断单地磁测速还是双地磁测速
 	{
+#if SOCKET_CARLENGTH_TYPE == SOCKET_CARLENGTH_V1
 		for (i = 0; i < OUTPUT_MAX; i++) {
 			if (SocketDataPacket[i].OutputID == outputid) {
 				if (i < SPEEDLANNUMMAX) {
@@ -439,8 +451,13 @@ float SOCKET_GetAvgLength(u16 outputid)
 					avgoccupancyval = SocketDataPacket[i].AvgOccupancy;
 				}
 				else {
+#if (INTERVALTIME == 0)
+					avgspeedval = SocketDataPacket[i].AvgSpeed;
+					avgoccupancyval = SocketDataPacket[i].AvgOccupancy;
+#else
 					avgspeedval = SocketDataPacket[i - SPEEDLANNUMMAX].AvgSpeed;
 					avgoccupancyval = SocketDataPacket[i - SPEEDLANNUMMAX].AvgOccupancy;
+#endif
 				}
 			}
 		}
@@ -452,6 +469,64 @@ float SOCKET_GetAvgLength(u16 outputid)
 		if ((avglengthval < AVGLENGTHMIN) && (avglengthval > 0.1)) {
 			avglengthval = AVGLENGTHMIN;
 		}
+#endif
+		
+#if SOCKET_CARLENGTH_TYPE == SOCKET_CARLENGTH_V2
+		for (i = 0; i < OUTPUT_MAX; i++) {
+			if (SocketDataPacket[i].OutputID == outputid) {
+				if (i < SPEEDLANNUMMAX) {
+					avgspeedval = SocketDataPacket[i].AvgSpeed;
+					avgoccupancyval = SocketDataPacket[i].AvgOccupancy;
+					avgoccupancyval = avgoccupancyval;
+				}
+				else {
+#if (INTERVALTIME == 0)
+					avgspeedval = SocketDataPacket[i].AvgSpeed;
+					avgoccupancyval = SocketDataPacket[i].AvgOccupancy;
+#else
+					avgspeedval = SocketDataPacket[i - SPEEDLANNUMMAX].AvgSpeed;
+					avgoccupancyval = SocketDataPacket[i - SPEEDLANNUMMAX].AvgOccupancy;
+					avgoccupancyval = avgoccupancyval;
+#endif
+				}
+				calculation_dev.ReadAvgInterval(outputid, &intervaltime1, &intervaltime2);
+			}
+		}
+		
+		avgspeedval1 = avgspeedval;
+		avgspeedval1 /= 3.6;
+		avglengthval1 = avgspeedval1 * intervaltime1;
+		avglengthval1 /= 1000;
+		avglengthval1 -= (SPEEDDISTANCEINTERVAL - 1);
+		avglengthval1 /= 2;
+		
+		avgspeedval2 = avgspeedval;
+		avgspeedval2 /= 3.6;
+		avglengthval2 = avgspeedval2 * intervaltime2;
+		avglengthval2 /= 1000;
+		avglengthval2 -= (SPEEDDISTANCEINTERVAL - 1);
+		
+		if (avglengthval1 > AVGLENGTHMIN) {
+			avglengthval += avglengthval1;
+			nCount++;
+		}
+		if (avglengthval2 > AVGLENGTHMIN) {
+			avglengthval += avglengthval2;
+			nCount++;
+		}
+		
+		if (avglengthval != 0) {
+			avglengthval /= nCount;
+		}
+		else if ((avglengthval < AVGLENGTHMIN) && (avglengthval > 0.1)) {
+			avglengthval = AVGLENGTHMIN;
+		}
+		else if ((avglengthval1 != 0) || (avglengthval2 != 0)) {
+			avglengthval = AVGLENGTHMIN;
+		}
+		
+		if (avglengthval > 18) avglengthval = 18;
+#endif
 	}
 	else {
 		avglengthval = AVGLENGTHSINGLE;
@@ -518,6 +593,27 @@ u8 SOCKET_GetSaturation(u16 outputid)
 **********************************************************************************************************/
 u16 SOCKET_GetDensity(u16 outputid)
 {
+	return 0;
+}
+
+/**********************************************************************************************************
+ @Function			u16 SOCKET_GetVoltage(u16 outputid)
+ @Description			例化获取Voltage
+ @Input				u16 outputid   	: 		车道ID号
+ @Return				u16 Voltage		: 		该车道Voltage值
+**********************************************************************************************************/
+u16 SOCKET_GetVoltage(u16 outputid)
+{
+	u8 i = 0;
+	
+	for (i = 0; i < OUTPUT_MAX; i++) {
+		if (outputid == SocketDataPacket[i].OutputID) {
+			if (output_Volt[i] != 0) {
+				return ((output_Volt[i] & 0x0F) * 0.15 + 2.1) * 100;
+			}
+		}
+	}
+	
 	return 0;
 }
 

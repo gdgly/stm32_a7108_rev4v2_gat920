@@ -44,24 +44,10 @@ void SOCKET_Xunfei_Client_Init(SOCKET_Xunfei_ClientsTypeDef* pClient)
 	
 	pClient->MsgId											= 1;
 	
+	SOCKET_Xunfei_Tr_Init(pClient);
 	
-	
-	
-	
-	
+	NET_SocketXunfei_FifoSendMessageInit();
+	NET_SocketXunfei_FifoRecvMessageInit();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /********************************************** END OF FLEE **********************************************/

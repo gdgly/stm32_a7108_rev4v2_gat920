@@ -103,20 +103,6 @@ void SOCKET_Xunfei_GetFillData(SOCKET_Xunfei_ClientsTypeDef* pClient)
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**********************************************************************************************************
  @Function			int SOCKET_Xunfei_GetDirverWayCode(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outputid, u16 inlen)
  @Description			SOCKET_Xunfei_GetDirverWayCode		: 获取车道编号
@@ -338,8 +324,13 @@ float SOCKET_Xunfei_GetAvgLength(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outp
 					avgoccupancyval = pClient->Parameter[i].AvgOccupancy;
 				}
 				else {
+#if (INTERVALTIME == 0)
+					avgspeedval = pClient->Parameter[i].AvgSpeed;
+					avgoccupancyval = pClient->Parameter[i].AvgOccupancy;
+#else
 					avgspeedval = pClient->Parameter[i - SPEEDLANNUMMAX].AvgSpeed;
 					avgoccupancyval = pClient->Parameter[i - SPEEDLANNUMMAX].AvgOccupancy;
+#endif
 				}
 			}
 		}
@@ -358,36 +349,5 @@ float SOCKET_Xunfei_GetAvgLength(SOCKET_Xunfei_ClientsTypeDef* pClient, u16 outp
 	
 	return avglengthval;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /********************************************** END OF FLEE **********************************************/

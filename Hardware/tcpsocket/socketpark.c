@@ -20,7 +20,9 @@
 #include "calculationconfig.h"
 #include "calculationavgspeed.h"
 #include "socketinitialization.h"
-
+#include "socketmessage.h"
+#include "sdiosdcardmessage.h"
+#include "bsp_usart.h"
 
 #ifdef SOCKET_SERIALPORT_USART1
 #define SOCKET_USART		USART1
@@ -85,7 +87,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 					SocketDataPacket[indexA].AvgLength = SocketDataPacket[indexB - 1].AvgLength;						//写入AvgLength
 					SocketDataPacket[indexA].Saturation = SocketDataPacket[indexB - 1].Saturation;						//写入Saturation
 					SocketDataPacket[indexA].Density = SocketDataPacket[indexB - 1].Density;							//写入Density
-					SocketDataPacket[indexA].Pcu = SocketDataPacket[indexB - 1].Pcu;									//写入Pcu
+					SocketDataPacket[indexA].Voltage = SocketDataPacket[indexB - 1].Voltage;							//写入Voltage
 					SocketDataPacket[indexA].AvgQueueLength = SocketDataPacket[indexB - 1].AvgQueueLength;				//写入AvgQueueLength
 					break;
 				}
@@ -107,7 +109,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 				SocketDataPacket[indexA].AvgLength = 0;															//写入AvgLength
 				SocketDataPacket[indexA].Saturation = socket_dev.GetSaturation(SocketDataPacket[indexA].OutputID);			//写入Saturation
 				SocketDataPacket[indexA].Density = socket_dev.GetDensity(SocketDataPacket[indexA].OutputID);				//写入Density
-				SocketDataPacket[indexA].Pcu = socket_dev.GetPcu(SocketDataPacket[indexA].OutputID);						//写入Pcu
+				SocketDataPacket[indexA].Voltage = socket_dev.GetVoltage(SocketDataPacket[indexA].OutputID);				//写入Voltage
 				SocketDataPacket[indexA].AvgQueueLength = socket_dev.GetAvgQueueLength(SocketDataPacket[indexA].OutputID);	//写入AvgQueueLength
 			}
 		}
@@ -129,7 +131,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 				SocketDataPacket[indexA].AvgLength = socket_dev.GetAvgLength(SocketDataPacket[indexA].OutputID);			//写入AvgLength
 				SocketDataPacket[indexA].Saturation = socket_dev.GetSaturation(SocketDataPacket[indexA].OutputID);			//写入Saturation
 				SocketDataPacket[indexA].Density = socket_dev.GetDensity(SocketDataPacket[indexA].OutputID);				//写入Density
-				SocketDataPacket[indexA].Pcu = socket_dev.GetPcu(SocketDataPacket[indexA].OutputID);						//写入Pcu
+				SocketDataPacket[indexA].Voltage = socket_dev.GetVoltage(SocketDataPacket[indexA].OutputID);				//写入Voltage
 				SocketDataPacket[indexA].AvgQueueLength = socket_dev.GetAvgQueueLength(SocketDataPacket[indexA].OutputID);	//写入AvgQueueLength
 			}
 			else {																					//辅地磁对应主地磁无配置
@@ -151,7 +153,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 						SocketDataPacket[indexA].AvgLength = SocketDataPacket[indexB - 1].AvgLength;						//写入AvgLength
 						SocketDataPacket[indexA].Saturation = SocketDataPacket[indexB - 1].Saturation;						//写入Saturation
 						SocketDataPacket[indexA].Density = SocketDataPacket[indexB - 1].Density;							//写入Density
-						SocketDataPacket[indexA].Pcu = SocketDataPacket[indexB - 1].Pcu;									//写入Pcu
+						SocketDataPacket[indexA].Voltage = SocketDataPacket[indexB - 1].Voltage;							//写入Voltage
 						SocketDataPacket[indexA].AvgQueueLength = SocketDataPacket[indexB - 1].AvgQueueLength;				//写入AvgQueueLength
 						break;
 					}
@@ -173,7 +175,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 					SocketDataPacket[indexA].AvgLength = socket_dev.GetAvgLength(SocketDataPacket[indexA].OutputID);			//写入AvgLength
 					SocketDataPacket[indexA].Saturation = socket_dev.GetSaturation(SocketDataPacket[indexA].OutputID);			//写入Saturation
 					SocketDataPacket[indexA].Density = socket_dev.GetDensity(SocketDataPacket[indexA].OutputID);				//写入Density
-					SocketDataPacket[indexA].Pcu = socket_dev.GetPcu(SocketDataPacket[indexA].OutputID);						//写入Pcu
+					SocketDataPacket[indexA].Voltage = socket_dev.GetVoltage(SocketDataPacket[indexA].OutputID);				//写入Voltage
 					SocketDataPacket[indexA].AvgQueueLength = socket_dev.GetAvgQueueLength(SocketDataPacket[indexA].OutputID);	//写入AvgQueueLength
 				}
 			}
@@ -199,7 +201,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 				SocketDataPacket[indexA].AvgLength = SocketDataPacket[indexB - 1].AvgLength;						//写入AvgLength
 				SocketDataPacket[indexA].Saturation = SocketDataPacket[indexB - 1].Saturation;						//写入Saturation
 				SocketDataPacket[indexA].Density = SocketDataPacket[indexB - 1].Density;							//写入Density
-				SocketDataPacket[indexA].Pcu = SocketDataPacket[indexB - 1].Pcu;									//写入Pcu
+				SocketDataPacket[indexA].Voltage = SocketDataPacket[indexB - 1].Voltage;							//写入Voltage
 				SocketDataPacket[indexA].AvgQueueLength = SocketDataPacket[indexB - 1].AvgQueueLength;				//写入AvgQueueLength
 				break;
 			}
@@ -226,7 +228,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 			SocketDataPacket[indexA].AvgLength = socket_dev.GetAvgLength(SocketDataPacket[indexA].OutputID);			//写入AvgLength
 			SocketDataPacket[indexA].Saturation = socket_dev.GetSaturation(SocketDataPacket[indexA].OutputID);			//写入Saturation
 			SocketDataPacket[indexA].Density = socket_dev.GetDensity(SocketDataPacket[indexA].OutputID);				//写入Density
-			SocketDataPacket[indexA].Pcu = socket_dev.GetPcu(SocketDataPacket[indexA].OutputID);						//写入Pcu
+			SocketDataPacket[indexA].Voltage = socket_dev.GetVoltage(SocketDataPacket[indexA].OutputID);				//写入Voltage
 			SocketDataPacket[indexA].AvgQueueLength = socket_dev.GetAvgQueueLength(SocketDataPacket[indexA].OutputID);	//写入AvgQueueLength
 		}
 	}
@@ -253,7 +255,7 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 	SocketParkDataPacket.AvgLength = SocketDataPacket[laneNo].AvgLength;										//写入AvgLength
 	SocketParkDataPacket.Saturation = SocketDataPacket[laneNo].Saturation;									//写入Saturation
 	SocketParkDataPacket.Density = SocketDataPacket[laneNo].Density;											//写入Density
-	SocketParkDataPacket.Pcu = SocketDataPacket[laneNo].Pcu;												//写入Pcu
+	SocketParkDataPacket.Voltage = SocketDataPacket[laneNo].Voltage;											//写入Voltage
 	SocketParkDataPacket.AvgQueueLength = SocketDataPacket[laneNo].AvgQueueLength;								//写入AvgQueueLength
 	
 	headlength = SOCKET_ParkObtainPacketHead((u8 *)SocketSendBuf);											//读取SocketPark包头数据并填入缓存
@@ -262,7 +264,18 @@ void SOCKET_ParkImplement(u8 laneNo, u16 CarNum, u8 CarInorOut)
 	datalength = socket_dev.ObtainPacketManuCheck((u8 *)SocketSendBuf, headlength);
 	headlength = headlength + datalength;
 	
+#if 0
 	SOCKET_USARTSend(SOCKET_USART, (u8 *)SocketSendBuf, headlength);											//发送数据
+#else
+	NET_Socket_Message_SendDataEnqueue((u8 *)SocketSendBuf, headlength);
+	
+#if SDIO_SDCARD_TYPE
+	
+	NET_Sdcard_Message_SendDataEnqueue((u8 *)SocketSendBuf, headlength);
+	
+#endif
+	
+#endif
 }
 
 /**********************************************************************************************************
@@ -298,7 +311,7 @@ void SOCKET_ParkImplementHeartbeatSend(u8 laneNo, u16 CarNum)
 	SocketParkDataPacket.AvgSpeed = 0;										//写入AvgSpeed
 	SocketParkDataPacket.Saturation = 0;									//写入Saturation
 	SocketParkDataPacket.Density = 0;										//写入Density
-	SocketParkDataPacket.Pcu = 0;											//写入Pcu
+	SocketParkDataPacket.Voltage = 0;										//写入Voltage
 	SocketParkDataPacket.AvgQueueLength = 0;								//写入AvgQueueLength
 	
 	headlength = SOCKET_ParkObtainPacketHead((u8 *)SocketSendBuf);				//读取SocketPark包头数据并填入缓存
@@ -307,7 +320,11 @@ void SOCKET_ParkImplementHeartbeatSend(u8 laneNo, u16 CarNum)
 	datalength = socket_dev.ObtainPacketManuCheck((u8 *)SocketSendBuf, headlength);
 	headlength = headlength + datalength;
 	
+#if 0
 	SOCKET_USARTSend(SOCKET_USART, (u8 *)SocketSendBuf, headlength);				//发送数据
+#else
+	NET_Socket_Message_SendDataEnqueue((u8 *)SocketSendBuf, headlength);
+#endif
 }
 
 /**********************************************************************************************************
@@ -318,6 +335,7 @@ void SOCKET_ParkImplementHeartbeatSend(u8 laneNo, u16 CarNum)
 **********************************************************************************************************/
 void SOCKET_ParkImplementHeartbeat(u8 *buf)
 {
+#if 0
 	u8 i = 0;
 	u16 carnumstate = 0;
 	RF_DataHeader_TypeDef *phead = (RF_DataHeader_TypeDef *)buf;
@@ -333,6 +351,7 @@ void SOCKET_ParkImplementHeartbeat(u8 *buf)
 			}
 		}
 	}
+#endif
 }
 
 /**********************************************************************************************************
@@ -483,7 +502,7 @@ u16 SOCKET_ParkObtainPacketData(u8 *addr)
 		datalength += 2;																		//地址偏移2byte
 	}
 	
-	if ((SOCKET_Convert2Byte((u8 *)&addr[datalength], SocketParkDataPacket.Pcu)) == SOCKET_FALSE) {				//填入当量小汽车
+	if ((SOCKET_Convert2Byte((u8 *)&addr[datalength], SocketParkDataPacket.Voltage)) == SOCKET_FALSE) {				//填入Voltage
 		return SOCKET_FALSE;
 	}
 	else {

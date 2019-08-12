@@ -17,7 +17,7 @@
 #include "calculationavgspeed.h"
 #include "calculationavgoccupancy.h"
 #include "calculationavgheadtime.h"
-
+#include "calculationavginterval.h"
 
 Calculation_Data_Packet			CalculationDataPacket[OUTPUT_MAX];				//数据计算包
 
@@ -40,6 +40,9 @@ struct _m_calculation_dev calculation_dev =
 	CALCULATION_GetAvgHeadTime,
 	CALCULATION_ReadAvgHeadTime,
 	CALCULATION_ReadAvgHeadTimeExtend,
+	
+	CALCULATION_GetAvgInterval,
+	CALCULATION_ReadAvgInterval,
 };
 
 /**********************************************************************************************************

@@ -6,9 +6,17 @@
 
 #define	MAX_MSG_ID						255
 
-#define	SOCKET_XUNFEI_SEND_BUFFER_SIZE		512
+#define	SOCKET_XUNFEI_SEND_BUFFER_SIZE		2048
 #define	SOCKET_XUNFEI_RECV_BUFFER_SIZE		512
 #define	SOCKET_XUNFEI_BUFFER_SIZW			1024
+
+#define	SOCKET_XUNFEI_AGAINSENDTIME			5
+
+#define	SOCKET_XUNFEI_LOGIN_REQUEST			1
+#define	SOCKET_XUNFEI_LOGIN_OVER				0
+
+#define	SOCKET_XUNFEI_LOGIN_ACCOUNT			"wt_magnetic"
+#define	SOCKET_XUNFEI_LOGIN_PASSWD			""
 
 #define	SOCKET_XUNFEI_DATA_TYPE_LOGIN_CON		"101"
 #define	SOCKET_XUNFEI_DATA_TYPE_LOGIN_ACK		"201"
@@ -43,10 +51,6 @@ struct SOCKET_Xunfei_ParameterTypeDef
 	unsigned short							AvgHeadTime;
 	float								AvgSpeed;
 	float								AvgLength;
-	
-	
-	
-	
 };
 
 struct SOCKET_Xunfei_ClientsTypeDef

@@ -19,6 +19,11 @@
 #include "socketinitialization.h"
 #include "socketconfig.h"
 #include "socketfunc.h"
+#include "socketmessage.h"
+#include "bsp_usart.h"
+
+#include "usrconfig.h"
+#include "usrserial.h"
 
 #ifdef SOCKET_SERIALPORT_USART1
 #define SOCKET_USART		USART1
@@ -54,9 +59,15 @@ volatile u8  SOCKET_RTC_CHECK = PACKETTYPE_RTCCHECKINIT;						//RTC对时校验标志 
 volatile u8  SOCKET_RTC_CHECK = PACKETTYPE_FLOWMESSAGE;
 #endif
 
+volatile u8  SOCKET_PARK_EVENT = 0;
+
 #ifdef SOCKETUSARTTXIRQn
 u16 SocketTxDataLangth = 0;												//发送数据长度
 volatile u16 TxCounter = 0;												//发送数据地址
+#endif
+
+#if SDIO_SDCARD_TYPE
+volatile bool SOCKET_ONLINE = false;
 #endif
 
 /**********************************************************************************************************
@@ -70,6 +81,10 @@ void SOCKET_Init(void)
 	socket_dev.PortSerialInit(SOCKET_USART, 115200);							//初始化Socket协议串口
 	SOCKET_RX_STA = 0;													//未接收数据状态
 	TIM_Cmd(TIM2, DISABLE);												//关闭定时器2
+	
+	NET_Socket_FifoSendMessageInit();
+	NET_Socket_FifoRecvMessageInit();
+	
 #ifdef SOCKETRTCCHECKLED1
 	if (PlatformSockettime == SocketTime_ENABLE) {
 		GPIO_SetBits(OUTPUT_TYPE[0], OUTPUT_PIN[0]);
@@ -182,6 +197,9 @@ void SOCKET_Implement(u16 sendtime)
 			if ((SocketReceiveBuf[8] == PACKETTYPE_RTCCHECK) ||				//接收数据正确
 			    (SocketReceiveBuf[8] == PACKETTYPE_RTCCHECKINIT) ||
 			    (SocketReceiveBuf[8] == PACKETTYPE_FLOWMESSAGE)) {
+#if SDIO_SDCARD_TYPE
+				SOCKET_ONLINE = true;
+#endif
 				sendnum = 0;
 				receiveflag = 0;
 				receivesendtime = 0;
@@ -220,6 +238,162 @@ void SOCKET_Implement(u16 sendtime)
 			GPIO_SetBits(OUTPUT_TYPE[0], OUTPUT_PIN[0]);
 #endif
 		}
+#endif
+	}
+}
+
+/**********************************************************************************************************
+ @Function			void SOCKET_Park_Implement(void)
+ @Description			Socket协议处理
+ @Input				void
+ @Return				void
+**********************************************************************************************************/
+void SOCKET_Park_Implement(void)
+{
+	static u16 socketparksendlength = 0;
+	static u16 receiveparkflag = 0;
+	static u16 receiveparksendtime = 0;
+	static u16 receiveparksendtimeagain = 0;
+	static u16 sendparknum = 0;
+	u32 parkrtctime = 0;
+	
+	if (NET_Socket_Message_SendDataDequeue((u8 *)SocketSendBuf, &socketparksendlength) == true) {
+		/* Send Data */
+		if (receiveparkflag == 0) {
+			SOCKET_RX_STA = 0;												//未接收数据状态
+#ifdef SOCKETUSARTTXIRQn
+			SocketTxDataLangth = socketparksendlength;							//获取发送数据长度
+			TxCounter = 0;													//发送地址归0
+			if (SOCKET_USART == USART1) {										//485发送
+				RS485_Mode_TX();
+				Delay(0x1fff);
+			}
+			USART_ITConfig(SOCKET_USART, USART_IT_TXE, ENABLE);					//开发送中断,并进入发送中断发送数据
+#else
+			SOCKET_USARTSend(SOCKET_USART, (u8 *)SocketSendBuf, socketsendlength);	//发送数据
+#endif
+			receiveparkflag = 1;
+		}
+		
+		if (receiveparkflag == 1) {
+			receiveparksendtime += 1;
+			receiveparksendtimeagain += 1;
+		}
+		if (receiveparksendtime >= SOCKET_PARK_AGAINSENDTIME) {					//到达检测时间
+			receiveparksendtime = 0;
+			if (SOCKET_RX_STA & 0X8000) {										//接收到期待的应答结果
+				if ((SocketReceiveBuf[8] == PACKETTYPE_RTCCHECK) || 
+				    (SocketReceiveBuf[8] == PACKETTYPE_RTCCHECKINIT)) {			//接受到对时数据
+					parkrtctime |= SocketReceiveBuf[13] << 24;
+					parkrtctime |= SocketReceiveBuf[14] << 16;
+					parkrtctime |= SocketReceiveBuf[15] << 8;
+					parkrtctime |= SocketReceiveBuf[16];
+					parkrtctime += (8 * 3600);								//获取时间数据
+					RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+					PWR_BackupAccessCmd(ENABLE);
+					RTC_WaitForLastTask();
+					RTC_SetCounter(parkrtctime);								//写入RTC寄存器值
+					RTC_WaitForLastTask();
+					SOCKET_RTC_CHECK = 0;									//对时结束置0
+#ifdef SOCKETRTCCHECKLED1
+					if (PlatformSockettime == SocketTime_ENABLE) {
+						GPIO_ResetBits(OUTPUT_TYPE[0], OUTPUT_PIN[0]);
+					}
+#endif
+				}
+				if ((SocketReceiveBuf[8] == PACKETTYPE_RTCCHECK) ||				//接收数据正确
+				    (SocketReceiveBuf[8] == PACKETTYPE_RTCCHECKINIT) ||
+				    (SocketReceiveBuf[8] == PACKETTYPE_FLOWMESSAGE) ||
+				    (SocketReceiveBuf[8] == PACKETTYPE_PARKINGLOTDATA)) {
+					NET_Socket_Message_SendDataOffSet();
+#if SDIO_SDCARD_TYPE
+					SOCKET_ONLINE = true;
+#endif
+					sendparknum = 0;
+					receiveparkflag = 0;
+					receiveparksendtime = 0;
+					receiveparksendtimeagain = 0;
+				}
+				else {
+					SOCKET_RX_STA = 0;
+				}
+			}
+			else {
+				if (receiveparksendtimeagain >= SOCKET_AGAINSENDTIME) {				//到达检测时间
+					receiveparksendtimeagain = 0;
+#ifdef SOCKETUSARTTXIRQn
+					SocketTxDataLangth = socketparksendlength;						//获取发送数据长度
+					TxCounter = 0;												//发送地址归0
+					if (SOCKET_USART == USART1) {									//485发送
+						RS485_Mode_TX();
+						Delay(0x1fff);
+					}
+					USART_ITConfig(SOCKET_USART, USART_IT_TXE, ENABLE);				//开发送中断,并进入发送中断发送数据
+#else
+					SOCKET_USARTSend(SOCKET_USART, (u8 *)SocketSendBuf, socketsendlength);//发送数据
+#endif
+					sendparknum += 1;
+					if (sendparknum >= 3) {
+#if SDIO_SDCARD_TYPE
+						SOCKET_ONLINE = false;
+#else
+						NET_Socket_Message_SendDataOffSet();
+#endif
+						sendparknum = 0;
+						receiveparkflag = 0;
+						receiveparksendtime = 0;
+						receiveparksendtimeagain = 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+/**********************************************************************************************************
+ @Function			void SOCKET_Park_ImplementEvent(void)
+ @Description			Socket协议处理
+ @Input				void
+ @Return				void
+**********************************************************************************************************/
+void SOCKET_Park_ImplementEvent(void)
+{
+#if !SOCKET_FUNC_TYPE
+	static u8 Socket_RealTime = 1;										//Socket实时上传对时
+	u32 rtctime = 0;
+#endif
+	
+	if (SOCKET_PARK_EVENT) {
+		SOCKET_PARK_EVENT = 0;
+#if (!SOCKET_FUNC_TYPE)
+#ifdef SOCKET_ENABLE
+		if (USRInitialized == USR_INITCONFIGOVER) {
+			if (PlatformSocket == Socket_ENABLE) {							//根据SN选择是否使能Socket
+				if (INTERVALTIME == 0) {
+					if (PlatformSockettime == SocketTime_ENABLE) {
+						if (Socket_RealTime == 1) {
+							socket_dev.Implement(10*1000);				//对时等待10秒
+						}
+						if (SOCKET_RTC_CHECK == 0) {						//对好时间
+							Socket_RealTime = 0;
+							SOCKET_Park_Implement();
+						}
+						else {
+							Socket_RealTime = 1;
+						}
+						rtctime = RTC_GetCounter();						//获取当前时间值
+						if ((rtctime % 86400) == 0) {						//判断是否到达凌晨0点
+							SOCKET_RTC_CHECK = PACKETTYPE_RTCCHECKINIT;		//开启RTC对时
+							GPIO_SetBits(GPIOA, GPIO_Pin_4);
+						}
+					}
+					else {
+						SOCKET_Park_Implement();
+					}
+				}
+			}
+		}
+#endif
 #endif
 	}
 }
